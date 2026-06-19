@@ -1,6 +1,6 @@
 module github.com/buan1027/workshop
 
-go 1.25.0
+go 1.25.11
 
 require (
 	github.com/coreos/go-oidc/v3 v3.19.0
