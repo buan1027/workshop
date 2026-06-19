@@ -204,6 +204,41 @@ func TestListRejectsUnknownQueryParameter(t *testing.T) {
 	}
 }
 
+func TestListReturnsPagingMetadata(t *testing.T) {
+	router := NewRouter(Dependencies{Repository: &fakeGebrauchtwagenRepository{items: []domain.Gebrauchtwagen{
+		{ID: 1, FIN: "WVWZZZ1JZXW000001", Marke: "VW", Modell: "Golf", Fahrzeugklasse: "KOMPAKTKLASSE", Kraftstoffart: "BENZIN", Schadenfrei: true, Kilometerstand: 12000, Version: 1},
+		{ID: 2, FIN: "WBA8E31090K000002", Marke: "BMW", Modell: "320d", Fahrzeugklasse: "MITTELKLASSE", Kraftstoffart: "DIESEL", Schadenfrei: false, Kilometerstand: 83000, Version: 1},
+	}}})
+	response := httptest.NewRecorder()
+	request := httptest.NewRequest(http.MethodGet, "/api/gebrauchtwagen?page=2&size=1", nil)
+
+	router.ServeHTTP(response, request)
+
+	if response.Code != http.StatusOK {
+		t.Fatalf("expected status 200, got %d", response.Code)
+	}
+
+	var page domain.Page
+	if err := json.Unmarshal(response.Body.Bytes(), &page); err != nil {
+		t.Fatalf("page response is not json: %v", err)
+	}
+	if page.Page != 2 || page.Size != 1 || page.Total != 2 {
+		t.Fatalf("unexpected paging metadata: %+v", page)
+	}
+}
+
+func TestListRejectsInvalidPaging(t *testing.T) {
+	router := NewRouter(Dependencies{Repository: &fakeGebrauchtwagenRepository{}})
+	response := httptest.NewRecorder()
+	request := httptest.NewRequest(http.MethodGet, "/api/gebrauchtwagen?page=0&size=51", nil)
+
+	router.ServeHTTP(response, request)
+
+	if response.Code != http.StatusUnprocessableEntity {
+		t.Fatalf("expected status 422, got %d", response.Code)
+	}
+}
+
 func TestDetailReturnsETag(t *testing.T) {
 	router := NewRouter(Dependencies{Repository: &fakeGebrauchtwagenRepository{items: []domain.Gebrauchtwagen{{
 		ID: 1, FIN: "WVWZZZ1JZXW000001", Marke: "VW", Modell: "Golf", Fahrzeugklasse: "KOMPAKTKLASSE", Kraftstoffart: "BENZIN", Schadenfrei: true, Kilometerstand: 12000, Version: 3,

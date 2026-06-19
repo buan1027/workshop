@@ -168,3 +168,33 @@ func TestPostgresGebrauchtwagenRepositoryFindsDetailRelations(t *testing.T) {
 		t.Fatal("expected schaeden slice to be initialized")
 	}
 }
+
+func TestPostgresGebrauchtwagenRepositoryPaginatesList(t *testing.T) {
+	databaseURL := os.Getenv("INTEGRATION_DATABASE_URL")
+	if databaseURL == "" {
+		t.Skip("INTEGRATION_DATABASE_URL is not set")
+	}
+
+	ctx := context.Background()
+	pool, err := pgxpool.New(ctx, databaseURL)
+	if err != nil {
+		t.Fatalf("create pool: %v", err)
+	}
+	defer pool.Close()
+
+	repo := NewPostgresGebrauchtwagenRepository(pool)
+	page, err := repo.List(ctx, domain.SearchParams{Page: 2, Size: 2})
+	if err != nil {
+		t.Fatalf("list gebrauchtwagen page 2: %v", err)
+	}
+
+	if page.Page != 2 || page.Size != 2 {
+		t.Fatalf("unexpected paging metadata: %+v", page)
+	}
+	if len(page.Data) > 2 {
+		t.Fatalf("expected at most two items, got %d", len(page.Data))
+	}
+	if page.Total < len(page.Data) {
+		t.Fatalf("expected total >= data length, got total=%d len=%d", page.Total, len(page.Data))
+	}
+}
