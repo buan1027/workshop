@@ -1,0 +1,30 @@
+meta {
+  name: Keycloak Admin Token
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{keycloakUrl}}/realms/{{keycloakRealm}}/protocol/openid-connect/token
+  body: form-urlencoded
+  auth: none
+}
+
+headers {
+  Content-Type: application/x-www-form-urlencoded
+}
+
+body:form-urlencoded {
+  grant_type: password
+  client_id: {{keycloakClientId}}
+  username: {{adminUsername}}
+  password: {{adminPassword}}
+}
+
+script:post-response {
+  bru.setEnvVar("adminToken", res.body.access_token);
+}
+
+docs {
+  Holt ein Keycloak-Access-Token fuer den Demo-Admin und speichert es als adminToken. Die REST-Requests fuer Create, Update und Delete nutzen adminToken als Bearer Token.
+}

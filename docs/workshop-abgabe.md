@@ -2,7 +2,7 @@
 
 ## Namen
 
-TODO
+Anna Wiedemann, Gruppe 2
 
 ## Link zum Git-Repository
 
@@ -123,6 +123,7 @@ Lokal gebuendelt in:
 - Manuelle REST-Requests liegen in `bruno/`.
 - Die Umgebung `local` verwendet `baseUrl = http://127.0.0.1:3000`, damit das VS-Code-Bruno-Plugin lokal stabil aufloest.
 - Der optionale `adminToken` kann gesetzt werden, wenn der Server mit `ADMIN_TOKEN` gestartet wurde.
+- Fuer Keycloak gibt es einen Auth-Request, der ein Access Token fuer `admin` holt und als `adminToken` speichert. Die vorhandenen schreibenden REST-Requests verwenden diese Variable bereits als Bearer Token.
 
 ### Weitere Artefakte
 
