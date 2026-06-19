@@ -133,6 +133,12 @@ func TestCreateGebrauchtwagen(t *testing.T) {
 	if location := response.Header().Get("Location"); location != "/api/gebrauchtwagen/1" {
 		t.Fatalf("expected Location /api/gebrauchtwagen/1, got %q", location)
 	}
+	if etag := response.Header().Get("ETag"); etag != `"1"` {
+		t.Fatalf("expected ETag \"1\", got %q", etag)
+	}
+	if !strings.Contains(response.Body.String(), `"id":1`) {
+		t.Fatalf("expected created item in response body, got %s", response.Body.String())
+	}
 	if len(repo.items) != 1 {
 		t.Fatalf("expected one created item, got %d", len(repo.items))
 	}

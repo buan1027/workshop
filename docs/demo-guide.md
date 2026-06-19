@@ -79,6 +79,7 @@ Invoke-WebRequest http://localhost:3000/api/gebrauchtwagen `
 ```
 
 Erwartung: Status `201 Created` und ein `Location`-Header, z.B. `/api/gebrauchtwagen/4`.
+Die Antwort enthaelt ausserdem den erstellten Datensatz und einen `ETag`.
 
 ## 9. Update mit Version zeigen
 

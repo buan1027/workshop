@@ -102,7 +102,8 @@ func (h GebrauchtwagenHandler) Create(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.Header().Set("Location", fmt.Sprintf("%s/%d", strings.TrimRight(r.URL.Path, "/"), created.ID))
-	w.WriteHeader(http.StatusCreated)
+	w.Header().Set("ETag", createETag(created.Version))
+	writeJSON(w, http.StatusCreated, created)
 }
 
 func (h GebrauchtwagenHandler) Update(w http.ResponseWriter, r *http.Request) {
