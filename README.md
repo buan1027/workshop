@@ -186,8 +186,17 @@ docker run --rm -p 3000:3000 `
   workshop-server
 ```
 
-## Naechste sinnvolle Erweiterungen
+## Umgesetzter Stand und optionale Erweiterungen
 
-- Integrationstest gegen echte PostgreSQL-Datenbank
-- Relationen `Standort`, `Schaden` und `Hauptuntersuchung` in Detailantworten aufnehmen
-- Keycloak/OIDC nur als optionaler Zusatz, wenn der Kern stabil laeuft
+Umgesetzt:
+
+- REST-Endpunkte fuer Healthchecks und Gebrauchtwagen-CRUD
+- Detailantwort mit `Standort`, `Schaden` und `Hauptuntersuchung`
+- Neuanlage mit optionalen relationalen Daten in einer Transaktion
+- Unit-, Handler- und optionale PostgreSQL-Integrationstests
+- Dockerfile, Docker Compose, Bruno-Collection, OpenAPI-Beschreibung und GitHub Actions
+- Linting und statische Analyse mit `gofmt`, `go vet`, `staticcheck` und `govulncheck`
+
+Optional, falls noch Zeit bleibt:
+
+- Keycloak/OIDC als vollwertiger Ersatz fuer den einfachen `ADMIN_TOKEN`-Schreibschutz
