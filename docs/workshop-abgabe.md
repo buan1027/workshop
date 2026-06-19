@@ -19,7 +19,7 @@ https://github.com/buan1027/workshop
 
 ### Chat-URLs
 
-- TODO: Chat-URL aus der verwendeten Sitzung eintragen, falls gefordert.
+- Keine oeffentliche Chat-URL verfuegbar. Die Arbeit erfolgte in einer lokalen Codex-Desktop-Sitzung.
 
 ## Frameworks und Bibliotheken
 
@@ -43,6 +43,12 @@ DELETE /api/gebrauchtwagen/{id}
 ```
 
 Die Listenabfrage unterstuetzt Filter und Paging mit `page`, `size` und `count-only`.
+
+Schluessel im Modell:
+
+- `id` ist der technische Primaerschluessel in PostgreSQL und wird automatisch vergeben.
+- `fin` ist 17-stellig, eindeutig und fachlich der stabile Fahrzeugschluessel fuer Clients.
+- Die REST-Pfade verwenden aktuell die technische `id`; die `fin` wird in Requests und Responses mitgefuehrt und serverseitig eindeutig validiert.
 
 ### Validierung (nur Neuanlegen)
 

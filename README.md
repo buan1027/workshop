@@ -99,6 +99,11 @@ PUT    /api/gebrauchtwagen/{id}
 DELETE /api/gebrauchtwagen/{id}
 ```
 
+Schluessel:
+
+- `id` ist der automatisch vergebene technische Primaerschluessel der Datenbank und wird fuer REST-Pfade wie `/api/gebrauchtwagen/{id}` verwendet.
+- `fin` ist 17-stellig und eindeutig. Sie ist der fachliche Fahrzeugschluessel, den ein Client stabil anzeigen und wiedererkennen kann.
+
 Filter fuer die Liste:
 
 ```text
