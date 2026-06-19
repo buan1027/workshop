@@ -70,7 +70,7 @@ Erwartung: Die Antwort enthaelt neben dem Fahrzeug auch `standort`, `hauptunters
 Invoke-WebRequest http://localhost:3000/api/gebrauchtwagen `
   -Method Post `
   -ContentType "application/json" `
-  -Body '{"marke":"","modell":"","fahrzeugklasse":"FALSCH","kraftstoffart":"BENZIN","schadenfrei":true,"kilometerstand":-1}'
+  -Body '{"fin":"ZU-KURZ","marke":"","modell":"","fahrzeugklasse":"FALSCH","kraftstoffart":"BENZIN","schadenfrei":true,"kilometerstand":-1}'
 ```
 
 Erwartung: Status `422` mit `application/problem+json`.
@@ -81,7 +81,7 @@ Erwartung: Status `422` mit `application/problem+json`.
 Invoke-WebRequest http://localhost:3000/api/gebrauchtwagen `
   -Method Post `
   -ContentType "application/json" `
-  -Body '{"marke":"Mercedes","modell":"C 200","fahrzeugklasse":"MITTELKLASSE","kraftstoffart":"BENZIN","schadenfrei":true,"kilometerstand":18000}'
+  -Body '{"fin":"WDBZZZ2051A000001","marke":"Mercedes","modell":"C 200","fahrzeugklasse":"MITTELKLASSE","kraftstoffart":"BENZIN","schadenfrei":true,"kilometerstand":18000}'
 ```
 
 Erwartung: Status `201 Created` und ein `Location`-Header, z.B. `/api/gebrauchtwagen/4`.
@@ -120,7 +120,7 @@ Invoke-WebRequest http://localhost:3000/api/gebrauchtwagen/1 `
   -Method Put `
   -ContentType "application/json" `
   -Headers @{ "If-Match" = '"1"' } `
-  -Body '{"marke":"VW","modell":"Golf Variant","fahrzeugklasse":"KOMBI","kraftstoffart":"BENZIN","schadenfrei":true,"kilometerstand":43000}'
+  -Body '{"fin":"WVWZZZ1JZXW000001","marke":"VW","modell":"Golf Variant","fahrzeugklasse":"KOMBI","kraftstoffart":"BENZIN","schadenfrei":true,"kilometerstand":43000}'
 ```
 
 Erwartung: Status `204 No Content` und ein neuer `ETag`.

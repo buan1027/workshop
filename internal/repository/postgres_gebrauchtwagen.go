@@ -4,7 +4,6 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"strconv"
 	"strings"
 	"time"
 
@@ -28,7 +27,7 @@ func (r *PostgresGebrauchtwagenRepository) List(ctx context.Context, search doma
 	offset := len(args) + 2
 
 	rows, err := r.db.Query(ctx, fmt.Sprintf(`
-		SELECT id, marke, modell, fahrzeugklasse::text, kraftstoffart::text, schadenfrei, kilometerstand, version
+		SELECT id, fin, marke, modell, fahrzeugklasse::text, kraftstoffart::text, schadenfrei, kilometerstand, version
 		FROM gebrauchtwagen.gebrauchtwagen
 		%s
 		ORDER BY id
@@ -53,7 +52,7 @@ func (r *PostgresGebrauchtwagenRepository) List(ctx context.Context, search doma
 
 func (r *PostgresGebrauchtwagenRepository) FindByID(ctx context.Context, id int) (domain.Gebrauchtwagen, error) {
 	row := r.db.QueryRow(ctx, `
-		SELECT id, marke, modell, fahrzeugklasse::text, kraftstoffart::text, schadenfrei, kilometerstand, version
+		SELECT id, fin, marke, modell, fahrzeugklasse::text, kraftstoffart::text, schadenfrei, kilometerstand, version
 		FROM gebrauchtwagen.gebrauchtwagen
 		WHERE id = $1`, id)
 
@@ -110,8 +109,8 @@ func (r *PostgresGebrauchtwagenRepository) Create(ctx context.Context, input dom
 			kraftstoffart, fahrzeugklasse, ausstattung, schadenfrei, version
 		)
 		VALUES ($1, $2, $3, $4, $5, $6, $7, $8, '{}'::jsonb, $9, 1)
-		RETURNING id, marke, modell, fahrzeugklasse::text, kraftstoffart::text, schadenfrei, kilometerstand, version`,
-		createFin(), input.Marke, input.Modell, now.Year(), now, input.Kilometerstand,
+		RETURNING id, fin, marke, modell, fahrzeugklasse::text, kraftstoffart::text, schadenfrei, kilometerstand, version`,
+		input.FIN, input.Marke, input.Modell, now.Year(), now, input.Kilometerstand,
 		input.Kraftstoffart, input.Fahrzeugklasse, input.Schadenfrei)
 
 	created, err := scanGebrauchtwagen(row)
@@ -183,12 +182,13 @@ func (r *PostgresGebrauchtwagenRepository) Update(ctx context.Context, id int, e
 		    kraftstoffart = $6,
 		    fahrzeugklasse = $7,
 		    schadenfrei = $8,
+		    fin = $9,
 		    version = version + 1,
 		    aktualisiert = CURRENT_TIMESTAMP
 		WHERE id = $1 AND version = $2
-		RETURNING id, marke, modell, fahrzeugklasse::text, kraftstoffart::text, schadenfrei, kilometerstand, version`,
+		RETURNING id, fin, marke, modell, fahrzeugklasse::text, kraftstoffart::text, schadenfrei, kilometerstand, version`,
 		id, expectedVersion, input.Marke, input.Modell, input.Kilometerstand,
-		input.Kraftstoffart, input.Fahrzeugklasse, input.Schadenfrei)
+		input.Kraftstoffart, input.Fahrzeugklasse, input.Schadenfrei, input.FIN)
 
 	item, err := scanGebrauchtwagen(row)
 	if err == nil {
@@ -221,7 +221,7 @@ func (r *PostgresGebrauchtwagenRepository) Delete(ctx context.Context, id int) e
 
 func scanGebrauchtwagen(row pgx.Row) (domain.Gebrauchtwagen, error) {
 	var item domain.Gebrauchtwagen
-	err := row.Scan(&item.ID, &item.Marke, &item.Modell, &item.Fahrzeugklasse, &item.Kraftstoffart, &item.Schadenfrei, &item.Kilometerstand, &item.Version)
+	err := row.Scan(&item.ID, &item.FIN, &item.Marke, &item.Modell, &item.Fahrzeugklasse, &item.Kraftstoffart, &item.Schadenfrei, &item.Kilometerstand, &item.Version)
 	return item, err
 }
 
@@ -295,14 +295,6 @@ func buildWhere(search domain.SearchParams) (string, []any) {
 		return "", args
 	}
 	return "WHERE " + strings.Join(clauses, " AND "), args
-}
-
-func createFin() string {
-	fin := "GW" + strings.ToUpper(strconv.FormatInt(time.Now().UnixNano(), 36))
-	if len(fin) > 17 {
-		return fin[:17]
-	}
-	return fin
 }
 
 func IsUniqueViolation(err error) bool {

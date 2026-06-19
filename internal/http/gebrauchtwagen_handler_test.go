@@ -49,6 +49,7 @@ func (f *fakeGebrauchtwagenRepository) FindDetailByID(ctx context.Context, id in
 func (f *fakeGebrauchtwagenRepository) Create(_ context.Context, input domain.GebrauchtwagenWrite) (domain.Gebrauchtwagen, error) {
 	item := domain.Gebrauchtwagen{
 		ID:             len(f.items) + 1,
+		FIN:            input.FIN,
 		Marke:          input.Marke,
 		Modell:         input.Modell,
 		Fahrzeugklasse: input.Fahrzeugklasse,
@@ -67,6 +68,7 @@ func (f *fakeGebrauchtwagenRepository) Update(_ context.Context, id int, expecte
 			if item.Version != expectedVersion {
 				return domain.Gebrauchtwagen{}, domain.ErrVersionConflict
 			}
+			item.FIN = input.FIN
 			item.Marke = input.Marke
 			item.Modell = input.Modell
 			item.Fahrzeugklasse = input.Fahrzeugklasse
@@ -121,7 +123,7 @@ func TestOptionsReturnsCORSHeaders(t *testing.T) {
 func TestCreateGebrauchtwagen(t *testing.T) {
 	repo := &fakeGebrauchtwagenRepository{}
 	router := NewRouter(Dependencies{Repository: repo})
-	body := `{"marke":"VW","modell":"Golf","fahrzeugklasse":"KOMPAKTKLASSE","kraftstoffart":"BENZIN","schadenfrei":true,"kilometerstand":12000}`
+	body := `{"fin":"WVWZZZ1JZXW000001","marke":"VW","modell":"Golf","fahrzeugklasse":"KOMPAKTKLASSE","kraftstoffart":"BENZIN","schadenfrei":true,"kilometerstand":12000}`
 	response := httptest.NewRecorder()
 	request := httptest.NewRequest(http.MethodPost, "/api/gebrauchtwagen/", strings.NewReader(body))
 
@@ -146,7 +148,7 @@ func TestCreateGebrauchtwagen(t *testing.T) {
 
 func TestCreateGebrauchtwagenRejectsInvalidInput(t *testing.T) {
 	router := NewRouter(Dependencies{Repository: &fakeGebrauchtwagenRepository{}})
-	body := `{"marke":"","modell":"","fahrzeugklasse":"FALSCH","kraftstoffart":"BENZIN","schadenfrei":true,"kilometerstand":-1}`
+	body := `{"fin":"ZU-KURZ","marke":"","modell":"","fahrzeugklasse":"FALSCH","kraftstoffart":"BENZIN","schadenfrei":true,"kilometerstand":-1}`
 	response := httptest.NewRecorder()
 	request := httptest.NewRequest(http.MethodPost, "/api/gebrauchtwagen/", bytes.NewBufferString(body))
 
@@ -162,7 +164,7 @@ func TestCreateRequiresAdminTokenWhenConfigured(t *testing.T) {
 		Repository: &fakeGebrauchtwagenRepository{},
 		AdminToken: "secret",
 	})
-	body := `{"marke":"VW","modell":"Golf","fahrzeugklasse":"KOMPAKTKLASSE","kraftstoffart":"BENZIN","schadenfrei":true,"kilometerstand":12000}`
+	body := `{"fin":"WVWZZZ1JZXW000001","marke":"VW","modell":"Golf","fahrzeugklasse":"KOMPAKTKLASSE","kraftstoffart":"BENZIN","schadenfrei":true,"kilometerstand":12000}`
 	response := httptest.NewRecorder()
 	request := httptest.NewRequest(http.MethodPost, "/api/gebrauchtwagen/", strings.NewReader(body))
 
@@ -178,7 +180,7 @@ func TestCreateAcceptsConfiguredAdminToken(t *testing.T) {
 		Repository: &fakeGebrauchtwagenRepository{},
 		AdminToken: "secret",
 	})
-	body := `{"marke":"VW","modell":"Golf","fahrzeugklasse":"KOMPAKTKLASSE","kraftstoffart":"BENZIN","schadenfrei":true,"kilometerstand":12000}`
+	body := `{"fin":"WVWZZZ1JZXW000001","marke":"VW","modell":"Golf","fahrzeugklasse":"KOMPAKTKLASSE","kraftstoffart":"BENZIN","schadenfrei":true,"kilometerstand":12000}`
 	response := httptest.NewRecorder()
 	request := httptest.NewRequest(http.MethodPost, "/api/gebrauchtwagen/", strings.NewReader(body))
 	request.Header.Set("Authorization", "Bearer secret")
@@ -204,7 +206,7 @@ func TestListRejectsUnknownQueryParameter(t *testing.T) {
 
 func TestDetailReturnsETag(t *testing.T) {
 	router := NewRouter(Dependencies{Repository: &fakeGebrauchtwagenRepository{items: []domain.Gebrauchtwagen{{
-		ID: 1, Marke: "VW", Modell: "Golf", Fahrzeugklasse: "KOMPAKTKLASSE", Kraftstoffart: "BENZIN", Schadenfrei: true, Kilometerstand: 12000, Version: 3,
+		ID: 1, FIN: "WVWZZZ1JZXW000001", Marke: "VW", Modell: "Golf", Fahrzeugklasse: "KOMPAKTKLASSE", Kraftstoffart: "BENZIN", Schadenfrei: true, Kilometerstand: 12000, Version: 3,
 	}}}})
 	response := httptest.NewRecorder()
 	request := httptest.NewRequest(http.MethodGet, "/api/gebrauchtwagen/1", nil)
@@ -224,7 +226,7 @@ func TestDetailReturnsETag(t *testing.T) {
 
 func TestUpdateRequiresIfMatch(t *testing.T) {
 	router := NewRouter(Dependencies{Repository: &fakeGebrauchtwagenRepository{items: []domain.Gebrauchtwagen{{ID: 1, Version: 1}}}})
-	body := `{"marke":"VW","modell":"Golf","fahrzeugklasse":"KOMPAKTKLASSE","kraftstoffart":"BENZIN","schadenfrei":true,"kilometerstand":12000}`
+	body := `{"fin":"WVWZZZ1JZXW000001","marke":"VW","modell":"Golf","fahrzeugklasse":"KOMPAKTKLASSE","kraftstoffart":"BENZIN","schadenfrei":true,"kilometerstand":12000}`
 	response := httptest.NewRecorder()
 	request := httptest.NewRequest(http.MethodPut, "/api/gebrauchtwagen/1", strings.NewReader(body))
 

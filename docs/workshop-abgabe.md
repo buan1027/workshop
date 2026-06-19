@@ -33,7 +33,7 @@ Begruendung: `chi` ist leichtgewichtig, gut dokumentiert und bleibt nah an idiom
 
 - Manuelle Validierung in `internal/domain`, aufgerufen aus `internal/service`.
 
-Begruendung: Fuer das kleine Datenmodell sind klare eigene Regeln einfacher zu erklaeren als ein zusaetzliches Validation-Framework. Validiert werden Pflichtfelder, Enum-Werte, Datumsfelder, `kilometerstand >= 0` und optionale Relationsdaten. Die Service-Schicht fuehrt diese Validierung aus, bevor das Repository PostgreSQL aufruft.
+Begruendung: Fuer das kleine Datenmodell sind klare eigene Regeln einfacher zu erklaeren als ein zusaetzliches Validation-Framework. Validiert werden Pflichtfelder, die 17-stellige FIN, Enum-Werte, Datumsfelder, `kilometerstand >= 0` und optionale Relationsdaten. Die Service-Schicht fuehrt diese Validierung aus, bevor das Repository PostgreSQL aufruft.
 
 ### OR-Mapping (fuer PostgreSQL)
 

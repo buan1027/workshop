@@ -9,6 +9,7 @@ import (
 
 type Gebrauchtwagen struct {
 	ID             int    `json:"id"`
+	FIN            string `json:"fin"`
 	Marke          string `json:"marke"`
 	Modell         string `json:"modell"`
 	Fahrzeugklasse string `json:"fahrzeugklasse"`
@@ -44,6 +45,7 @@ type Schaden struct {
 }
 
 type GebrauchtwagenWrite struct {
+	FIN               string                  `json:"fin"`
 	Marke             string                  `json:"marke"`
 	Modell            string                  `json:"modell"`
 	Fahrzeugklasse    string                  `json:"fahrzeugklasse"`
@@ -110,11 +112,15 @@ var huStatus = map[string]bool{
 
 func ValidateWrite(input *GebrauchtwagenWrite) []string {
 	var problems []string
+	input.FIN = strings.TrimSpace(input.FIN)
 	input.Marke = strings.TrimSpace(input.Marke)
 	input.Modell = strings.TrimSpace(input.Modell)
 	input.Fahrzeugklasse = strings.TrimSpace(input.Fahrzeugklasse)
 	input.Kraftstoffart = strings.TrimSpace(input.Kraftstoffart)
 
+	if len(input.FIN) != 17 {
+		problems = append(problems, "fin muss genau 17 Zeichen lang sein")
+	}
 	if input.Marke == "" {
 		problems = append(problems, "marke darf nicht leer sein")
 	}

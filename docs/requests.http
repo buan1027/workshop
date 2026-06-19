@@ -20,6 +20,7 @@ POST {{baseUrl}}/api/gebrauchtwagen
 Content-Type: application/json
 
 {
+  "fin": "WDBZZZ2051A000001",
   "marke": "Mercedes",
   "modell": "C 200",
   "fahrzeugklasse": "MITTELKLASSE",
@@ -51,6 +52,7 @@ Content-Type: application/json
 If-Match: "1"
 
 {
+  "fin": "WVWZZZ1JZXW000001",
   "marke": "VW",
   "modell": "Golf Variant",
   "fahrzeugklasse": "KOMBI",

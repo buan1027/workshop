@@ -98,7 +98,7 @@ Beispiel fuer Neuanlage:
 Invoke-RestMethod http://localhost:3000/api/gebrauchtwagen `
   -Method Post `
   -ContentType "application/json" `
-  -Body '{"marke":"VW","modell":"Golf","fahrzeugklasse":"KOMPAKTKLASSE","kraftstoffart":"BENZIN","schadenfrei":true,"kilometerstand":12000}'
+  -Body '{"fin":"WVWZZZ1JZXW000001","marke":"VW","modell":"Golf","fahrzeugklasse":"KOMPAKTKLASSE","kraftstoffart":"BENZIN","schadenfrei":true,"kilometerstand":12000}'
 ```
 
 Weitere Beispielrequests liegen in `docs/requests.http`.
@@ -111,6 +111,7 @@ Eine Bruno-Collection fuer manuelle API-Tests liegt in `bruno/`.
 Beim Schreiben werden Pflichtfelder und Enum-Werte validiert:
 
 - `marke` und `modell` duerfen nicht leer sein
+- `fin` muss genau 17 Zeichen lang sein
 - `fahrzeugklasse` muss einem bekannten Enum entsprechen
 - `kraftstoffart` muss einem bekannten Enum entsprechen
 - `kilometerstand` muss mindestens `0` sein

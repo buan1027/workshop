@@ -57,6 +57,7 @@ func TestCreateDelegatesValidInput(t *testing.T) {
 	service := NewGebrauchtwagenService(repo)
 
 	created, err := service.Create(context.Background(), domain.GebrauchtwagenWrite{
+		FIN:            "WVWZZZ1JZXW000001",
 		Marke:          "VW",
 		Modell:         "Golf",
 		Fahrzeugklasse: "KOMPAKTKLASSE",

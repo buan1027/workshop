@@ -4,6 +4,7 @@ import "testing"
 
 func TestValidateWriteAcceptsValidInputAndTrimsStrings(t *testing.T) {
 	input := GebrauchtwagenWrite{
+		FIN:            "WVWZZZ1JZXW000001",
 		Marke:          " VW ",
 		Modell:         " Golf ",
 		Fahrzeugklasse: "KOMPAKTKLASSE",
@@ -33,13 +34,14 @@ func TestValidateWriteRejectsInvalidInput(t *testing.T) {
 
 	problems := ValidateWrite(&input)
 
-	if len(problems) != 5 {
-		t.Fatalf("expected 5 validation problems, got %d: %v", len(problems), problems)
+	if len(problems) != 6 {
+		t.Fatalf("expected 6 validation problems, got %d: %v", len(problems), problems)
 	}
 }
 
 func TestValidateWriteAcceptsOptionalRelations(t *testing.T) {
 	input := GebrauchtwagenWrite{
+		FIN:            "WVWZZZ1JZXW000001",
 		Marke:          "VW",
 		Modell:         "Golf",
 		Fahrzeugklasse: "KOMPAKTKLASSE",

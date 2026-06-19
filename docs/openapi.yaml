@@ -193,6 +193,7 @@ components:
     GebrauchtwagenWrite:
       type: object
       required:
+        - fin
         - marke
         - modell
         - fahrzeugklasse
@@ -200,6 +201,10 @@ components:
         - schadenfrei
         - kilometerstand
       properties:
+        fin:
+          type: string
+          minLength: 17
+          maxLength: 17
         marke:
           type: string
           minLength: 1

@@ -26,6 +26,7 @@ func TestPostgresGebrauchtwagenRepositoryCRUD(t *testing.T) {
 
 	repo := NewPostgresGebrauchtwagenRepository(pool)
 	input := domain.GebrauchtwagenWrite{
+		FIN:            "TSTZZZ1JZXW000001",
 		Marke:          "Testmarke",
 		Modell:         "Testmodell",
 		Fahrzeugklasse: "KOMPAKTKLASSE",
@@ -48,7 +49,7 @@ func TestPostgresGebrauchtwagenRepositoryCRUD(t *testing.T) {
 	if err != nil {
 		t.Fatalf("find created gebrauchtwagen: %v", err)
 	}
-	if found.Marke != input.Marke || found.Version != 1 {
+	if found.FIN != input.FIN || found.Marke != input.Marke || found.Version != 1 {
 		t.Fatalf("unexpected created gebrauchtwagen: %+v", found)
 	}
 
@@ -92,6 +93,7 @@ func TestPostgresGebrauchtwagenRepositoryCreatesRelationData(t *testing.T) {
 
 	repo := NewPostgresGebrauchtwagenRepository(pool)
 	input := domain.GebrauchtwagenWrite{
+		FIN:            "RELZZZ1JZXW000001",
 		Marke:          "Relation",
 		Modell:         "Test",
 		Fahrzeugklasse: "KOMPAKTKLASSE",
