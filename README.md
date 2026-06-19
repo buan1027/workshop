@@ -93,6 +93,7 @@ Invoke-RestMethod http://localhost:3000/api/gebrauchtwagen `
 ```
 
 Weitere Beispielrequests liegen in `docs/requests.http`.
+Ein kompakter Vorfuehrablauf liegt in `docs/demo-guide.md`.
 
 ## Validierung und Fehler
 
