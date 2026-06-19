@@ -1,0 +1,65 @@
+@startuml
+title Gebrauchtwagen - ER-Diagramm
+
+hide circle
+skinparam linetype ortho
+
+entity "gebrauchtwagen" as Gebrauchtwagen {
+  * id : integer <<PK>>
+  --
+  * version : integer
+  * fin : varchar(17) <<UNIQUE>>
+  * marke : varchar(100)
+  * modell : varchar(100)
+  * baujahr : integer
+  * erstzulassung : date
+  * kilometerstand : integer
+  * kraftstoffart : kraftstoffart
+  * fahrzeugklasse : fahrzeugklasse
+  * ausstattung : jsonb
+  * schadenfrei : boolean
+  beschreibung_url : varchar(255)
+  anbieter_username : varchar(100)
+  kontakt_email : varchar(255)
+  * erzeugt : timestamp
+  * aktualisiert : timestamp
+}
+
+entity "standort" as Standort {
+  * id : integer <<PK>>
+  --
+  * plz : varchar(10)
+  * ort : varchar(100)
+  * gebrauchtwagen_id : integer <<FK, UNIQUE>>
+}
+
+entity "hauptuntersuchung" as HU {
+  * id : integer <<PK>>
+  --
+  * pruefdatum : date
+  * gueltig_bis : date
+  * prueforganisation : varchar(100)
+  * status : hu_status
+  * gebrauchtwagen_id : integer <<FK, UNIQUE>>
+}
+
+entity "schaden" as Schaden {
+  * id : integer <<PK>>
+  --
+  * bezeichnung : varchar(100)
+  * beschreibung : varchar(500)
+  * feststellungsdatum : date
+  * gebrauchtwagen_id : integer <<FK>>
+}
+
+Gebrauchtwagen ||--o| Standort : hat
+Gebrauchtwagen ||--o| HU : hat
+Gebrauchtwagen ||--o{ Schaden : hat
+
+note right of Gebrauchtwagen
+id ist technischer Primaerschluessel.
+fin ist fachlich eindeutig und fuer Clients
+der stabile Fahrzeugschluessel.
+end note
+
+@enduml

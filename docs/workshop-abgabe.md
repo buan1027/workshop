@@ -129,7 +129,9 @@ Lokal gebuendelt in:
 
 - `README.md`: Start-, Test- und Architekturhinweise fuer die schnelle Nutzung.
 - `docs/architecture.md`: Kurzbeschreibung der Schichten.
+- `docs/projekthandbuch.adoc`: Kompaktes Projekthandbuch in AsciiDoc.
 - `docs/demo-guide.md`: Vorfuehrablauf mit konkreten Requests.
+- `docs/diagramme/src/*.puml`: PlantUML-Quellen fuer Komponenten, ER-Modell und Update-Sequenz.
 - `docs/openapi.yaml`: Schlanke OpenAPI-Beschreibung.
 - `.github/workflows/go.yml`: CI mit Formatierung, Analyse, Tests und Vulnerability-Check.
 

@@ -1,0 +1,38 @@
+@startuml
+title REST Update mit optimistischer Versionierung
+
+actor Client
+participant "HTTP API\ninternal/http" as Http
+participant "Service\ninternal/service" as Service
+participant "Repository\ninternal/repository" as Repo
+database "PostgreSQL" as DB
+
+Client -> Http : GET /api/gebrauchtwagen/{id}
+Http -> Service : FindDetailByID(id)
+Service -> Repo : FindDetailByID(id)
+Repo -> DB : SELECT ... version
+DB --> Repo : Fahrzeug + Relationen
+Repo --> Service : GebrauchtwagenDetail
+Service --> Http : GebrauchtwagenDetail
+Http --> Client : 200 OK\nETag: "1"
+
+Client -> Http : PUT /api/gebrauchtwagen/{id}\nIf-Match: "1"
+Http -> Http : parseIfMatch()
+Http -> Service : Update(id, version, input)
+Service -> Service : ValidateWrite(input)
+Service -> Repo : Update(id, version, input)
+Repo -> DB : UPDATE ...\nWHERE id = ? AND version = ?\nversion = version + 1
+
+alt Version aktuell
+  DB --> Repo : updated row, version 2
+  Repo --> Service : Gebrauchtwagen
+  Service --> Http : Gebrauchtwagen
+  Http --> Client : 204 No Content\nETag: "2"
+else Version veraltet
+  DB --> Repo : no row
+  Repo --> Service : ErrVersionConflict
+  Service --> Http : ErrVersionConflict
+  Http --> Client : 412 Precondition Failed
+end
+
+@enduml

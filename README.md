@@ -32,6 +32,7 @@ internal/auth/           Optionaler Schreibschutz mit ADMIN_TOKEN oder Keycloak/
 ```
 
 Eine ausfuehrlichere Architekturbeschreibung liegt in `docs/architecture.md`.
+Ein kompaktes Projekthandbuch liegt in `docs/projekthandbuch.adoc`; PlantUML-Quellen liegen unter `docs/diagramme/src/`.
 
 ## Konfiguration
 
@@ -131,6 +132,12 @@ Weitere Beispielrequests liegen in `docs/requests.http`.
 Ein kompakter Vorfuehrablauf liegt in `docs/demo-guide.md`.
 Eine schlanke OpenAPI-Beschreibung liegt in `docs/openapi.yaml`.
 Eine Bruno-Collection fuer manuelle API-Tests liegt in `bruno/`.
+
+Optionale Dokumentation bauen, falls Asciidoctor und PlantUML lokal installiert sind:
+
+```powershell
+.\scripts\build-docs.ps1
+```
 
 ## Validierung und Fehler
 
@@ -255,6 +262,7 @@ Umgesetzt:
 - Optionaler Schreibschutz mit `ADMIN_TOKEN` oder Keycloak/OIDC
 - Unit-, Handler- und optionale PostgreSQL-Integrationstests
 - Dockerfile, Docker Compose, Bruno-Collection, OpenAPI-Beschreibung und GitHub Actions
+- PlantUML-Quellen und kompaktes Projekthandbuch in AsciiDoc
 - Linting und statische Analyse mit `gofmt`, `go vet`, `staticcheck` und `govulncheck`
 
 Optional, falls noch Zeit bleibt:
