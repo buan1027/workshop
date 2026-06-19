@@ -97,8 +97,14 @@ func (r *PostgresGebrauchtwagenRepository) FindDetailByID(ctx context.Context, i
 }
 
 func (r *PostgresGebrauchtwagenRepository) Create(ctx context.Context, input domain.GebrauchtwagenWrite) (domain.Gebrauchtwagen, error) {
+	tx, err := r.db.Begin(ctx)
+	if err != nil {
+		return domain.Gebrauchtwagen{}, err
+	}
+	defer tx.Rollback(ctx) //nolint:errcheck
+
 	now := time.Now()
-	row := r.db.QueryRow(ctx, `
+	row := tx.QueryRow(ctx, `
 		INSERT INTO gebrauchtwagen.gebrauchtwagen (
 			fin, marke, modell, baujahr, erstzulassung, kilometerstand,
 			kraftstoffart, fahrzeugklasse, ausstattung, schadenfrei, version
@@ -108,7 +114,20 @@ func (r *PostgresGebrauchtwagenRepository) Create(ctx context.Context, input dom
 		createFin(), input.Marke, input.Modell, now.Year(), now, input.Kilometerstand,
 		input.Kraftstoffart, input.Fahrzeugklasse, input.Schadenfrei)
 
-	return scanGebrauchtwagen(row)
+	created, err := scanGebrauchtwagen(row)
+	if err != nil {
+		return domain.Gebrauchtwagen{}, err
+	}
+
+	if err := insertRelationData(ctx, tx, created.ID, input); err != nil {
+		return domain.Gebrauchtwagen{}, err
+	}
+
+	if err := tx.Commit(ctx); err != nil {
+		return domain.Gebrauchtwagen{}, err
+	}
+
+	return created, nil
 }
 
 func (r *PostgresGebrauchtwagenRepository) findStandort(ctx context.Context, gebrauchtwagenID int) (*domain.Standort, error) {
@@ -204,6 +223,48 @@ func scanGebrauchtwagen(row pgx.Row) (domain.Gebrauchtwagen, error) {
 	var item domain.Gebrauchtwagen
 	err := row.Scan(&item.ID, &item.Marke, &item.Modell, &item.Fahrzeugklasse, &item.Kraftstoffart, &item.Schadenfrei, &item.Kilometerstand, &item.Version)
 	return item, err
+}
+
+func insertRelationData(ctx context.Context, tx pgx.Tx, gebrauchtwagenID int, input domain.GebrauchtwagenWrite) error {
+	if input.Standort != nil {
+		if _, err := tx.Exec(ctx, `
+			INSERT INTO gebrauchtwagen.standort (plz, ort, gebrauchtwagen_id)
+			VALUES ($1, $2, $3)`,
+			input.Standort.PLZ, input.Standort.Ort, gebrauchtwagenID); err != nil {
+			return err
+		}
+	}
+
+	if input.Hauptuntersuchung != nil {
+		if _, err := tx.Exec(ctx, `
+			INSERT INTO gebrauchtwagen.hauptuntersuchung (
+				pruefdatum, gueltig_bis, prueforganisation, status, gebrauchtwagen_id
+			)
+			VALUES ($1, $2, $3, $4, $5)`,
+			input.Hauptuntersuchung.Pruefdatum,
+			input.Hauptuntersuchung.GueltigBis,
+			input.Hauptuntersuchung.Prueforganisation,
+			input.Hauptuntersuchung.Status,
+			gebrauchtwagenID); err != nil {
+			return err
+		}
+	}
+
+	for _, schaden := range input.Schaeden {
+		if _, err := tx.Exec(ctx, `
+			INSERT INTO gebrauchtwagen.schaden (
+				bezeichnung, beschreibung, feststellungsdatum, gebrauchtwagen_id
+			)
+			VALUES ($1, $2, $3, $4)`,
+			schaden.Bezeichnung,
+			schaden.Beschreibung,
+			schaden.Feststellungsdatum,
+			gebrauchtwagenID); err != nil {
+			return err
+		}
+	}
+
+	return nil
 }
 
 func buildWhere(search domain.SearchParams) (string, []any) {

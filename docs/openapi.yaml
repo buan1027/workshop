@@ -215,3 +215,39 @@ components:
         kilometerstand:
           type: integer
           minimum: 0
+        standort:
+          type: object
+          properties:
+            plz:
+              type: string
+            ort:
+              type: string
+        hauptuntersuchung:
+          type: object
+          properties:
+            pruefdatum:
+              type: string
+              format: date
+            gueltigBis:
+              type: string
+              format: date
+            prueforganisation:
+              type: string
+            status:
+              type: string
+              enum:
+                - BESTANDEN
+                - NICHT_BESTANDEN
+                - AUSSTEHEND
+        schaeden:
+          type: array
+          items:
+            type: object
+            properties:
+              bezeichnung:
+                type: string
+              beschreibung:
+                type: string
+              feststellungsdatum:
+                type: string
+                format: date

@@ -77,6 +77,66 @@ func TestPostgresGebrauchtwagenRepositoryCRUD(t *testing.T) {
 	}
 }
 
+func TestPostgresGebrauchtwagenRepositoryCreatesRelationData(t *testing.T) {
+	databaseURL := os.Getenv("INTEGRATION_DATABASE_URL")
+	if databaseURL == "" {
+		t.Skip("INTEGRATION_DATABASE_URL is not set")
+	}
+
+	ctx := context.Background()
+	pool, err := pgxpool.New(ctx, databaseURL)
+	if err != nil {
+		t.Fatalf("create pool: %v", err)
+	}
+	defer pool.Close()
+
+	repo := NewPostgresGebrauchtwagenRepository(pool)
+	input := domain.GebrauchtwagenWrite{
+		Marke:          "Relation",
+		Modell:         "Test",
+		Fahrzeugklasse: "KOMPAKTKLASSE",
+		Kraftstoffart:  "BENZIN",
+		Schadenfrei:    false,
+		Kilometerstand: 20000,
+		Standort:       &domain.StandortWrite{PLZ: "76131", Ort: "Karlsruhe"},
+		Hauptuntersuchung: &domain.HauptuntersuchungWrite{
+			Pruefdatum:        "2025-06-01",
+			GueltigBis:        "2027-06-01",
+			Prueforganisation: "TUEV",
+			Status:            "BESTANDEN",
+		},
+		Schaeden: []domain.SchadenWrite{{
+			Bezeichnung:        "Kratzer",
+			Beschreibung:       "Kleiner Lackkratzer",
+			Feststellungsdatum: "2024-11-10",
+		}},
+	}
+
+	created, err := repo.Create(ctx, input)
+	if err != nil {
+		t.Fatalf("create gebrauchtwagen with relations: %v", err)
+	}
+	t.Cleanup(func() {
+		deleteCtx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+		defer cancel()
+		_ = repo.Delete(deleteCtx, created.ID)
+	})
+
+	detail, err := repo.FindDetailByID(ctx, created.ID)
+	if err != nil {
+		t.Fatalf("find created detail: %v", err)
+	}
+	if detail.Standort == nil || detail.Standort.Ort != "Karlsruhe" {
+		t.Fatalf("expected Standort Karlsruhe, got %+v", detail.Standort)
+	}
+	if detail.Hauptuntersuchung == nil || detail.Hauptuntersuchung.Status != "BESTANDEN" {
+		t.Fatalf("expected HU BESTANDEN, got %+v", detail.Hauptuntersuchung)
+	}
+	if len(detail.Schaeden) != 1 {
+		t.Fatalf("expected one schaden, got %d", len(detail.Schaeden))
+	}
+}
+
 func TestPostgresGebrauchtwagenRepositoryFindsDetailRelations(t *testing.T) {
 	databaseURL := os.Getenv("INTEGRATION_DATABASE_URL")
 	if databaseURL == "" {

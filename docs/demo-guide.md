@@ -86,6 +86,7 @@ Invoke-WebRequest http://localhost:3000/api/gebrauchtwagen `
 
 Erwartung: Status `201 Created` und ein `Location`-Header, z.B. `/api/gebrauchtwagen/4`.
 Die Antwort enthaelt ausserdem den erstellten Datensatz und einen `ETag`.
+Der Request kann optional auch `standort`, `hauptuntersuchung` und `schaeden` enthalten; diese Daten werden in einer Transaktion mit angelegt.
 
 ## 9. Optionalen Schreibschutz zeigen
 

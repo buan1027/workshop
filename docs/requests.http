@@ -25,7 +25,24 @@ Content-Type: application/json
   "fahrzeugklasse": "MITTELKLASSE",
   "kraftstoffart": "BENZIN",
   "schadenfrei": true,
-  "kilometerstand": 18000
+  "kilometerstand": 18000,
+  "standort": {
+    "plz": "76131",
+    "ort": "Karlsruhe"
+  },
+  "hauptuntersuchung": {
+    "pruefdatum": "2025-06-01",
+    "gueltigBis": "2027-06-01",
+    "prueforganisation": "TUEV",
+    "status": "BESTANDEN"
+  },
+  "schaeden": [
+    {
+      "bezeichnung": "Kratzer",
+      "beschreibung": "Kleiner Lackkratzer",
+      "feststellungsdatum": "2024-11-10"
+    }
+  ]
 }
 
 ### Update mit ETag-Version
