@@ -18,6 +18,17 @@ const (
 	maxPageSize     = 50
 )
 
+var allowedSearchParams = map[string]bool{
+	"count-only":     true,
+	"fahrzeugklasse": true,
+	"kraftstoffart":  true,
+	"marke":          true,
+	"modell":         true,
+	"page":           true,
+	"schadenfrei":    true,
+	"size":           true,
+}
+
 type GebrauchtwagenHandler struct {
 	Repository repository.GebrauchtwagenRepository
 	AdminToken string
@@ -199,6 +210,11 @@ func parseSearch(r *http.Request) (domain.SearchParams, []string) {
 	}
 
 	var problems []string
+	for key := range query {
+		if !allowedSearchParams[key] {
+			problems = append(problems, fmt.Sprintf("query-parameter %q ist nicht erlaubt", key))
+		}
+	}
 	if !domain.IsValidFahrzeugklasse(search.Fahrzeugklasse) {
 		problems = append(problems, "fahrzeugklasse ist ungueltig")
 	}

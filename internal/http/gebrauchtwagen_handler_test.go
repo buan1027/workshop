@@ -136,6 +136,18 @@ func TestCreateGebrauchtwagenRejectsInvalidInput(t *testing.T) {
 	}
 }
 
+func TestListRejectsUnknownQueryParameter(t *testing.T) {
+	router := NewRouter(Dependencies{Repository: &fakeGebrauchtwagenRepository{}})
+	response := httptest.NewRecorder()
+	request := httptest.NewRequest(http.MethodGet, "/api/gebrauchtwagen?farbe=rot", nil)
+
+	router.ServeHTTP(response, request)
+
+	if response.Code != http.StatusUnprocessableEntity {
+		t.Fatalf("expected status 422, got %d", response.Code)
+	}
+}
+
 func TestDetailReturnsETag(t *testing.T) {
 	router := NewRouter(Dependencies{Repository: &fakeGebrauchtwagenRepository{items: []domain.Gebrauchtwagen{{
 		ID: 1, Marke: "VW", Modell: "Golf", Fahrzeugklasse: "KOMPAKTKLASSE", Kraftstoffart: "BENZIN", Schadenfrei: true, Kilometerstand: 12000, Version: 3,
