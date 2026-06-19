@@ -64,6 +64,38 @@ func (r *PostgresGebrauchtwagenRepository) FindByID(ctx context.Context, id int)
 	return item, err
 }
 
+func (r *PostgresGebrauchtwagenRepository) FindDetailByID(ctx context.Context, id int) (domain.GebrauchtwagenDetail, error) {
+	item, err := r.FindByID(ctx, id)
+	if err != nil {
+		return domain.GebrauchtwagenDetail{}, err
+	}
+
+	detail := domain.GebrauchtwagenDetail{
+		Gebrauchtwagen: item,
+		Schaeden:       []domain.Schaden{},
+	}
+
+	standort, err := r.findStandort(ctx, id)
+	if err != nil {
+		return domain.GebrauchtwagenDetail{}, err
+	}
+	detail.Standort = standort
+
+	hu, err := r.findHauptuntersuchung(ctx, id)
+	if err != nil {
+		return domain.GebrauchtwagenDetail{}, err
+	}
+	detail.Hauptuntersuchung = hu
+
+	schaeden, err := r.findSchaeden(ctx, id)
+	if err != nil {
+		return domain.GebrauchtwagenDetail{}, err
+	}
+	detail.Schaeden = schaeden
+
+	return detail, nil
+}
+
 func (r *PostgresGebrauchtwagenRepository) Create(ctx context.Context, input domain.GebrauchtwagenWrite) (domain.Gebrauchtwagen, error) {
 	now := time.Now()
 	row := r.db.QueryRow(ctx, `
@@ -77,6 +109,50 @@ func (r *PostgresGebrauchtwagenRepository) Create(ctx context.Context, input dom
 		input.Kraftstoffart, input.Fahrzeugklasse, input.Schadenfrei)
 
 	return scanGebrauchtwagen(row)
+}
+
+func (r *PostgresGebrauchtwagenRepository) findStandort(ctx context.Context, gebrauchtwagenID int) (*domain.Standort, error) {
+	var standort domain.Standort
+	err := r.db.QueryRow(ctx, `
+		SELECT plz, ort
+		FROM gebrauchtwagen.standort
+		WHERE gebrauchtwagen_id = $1`, gebrauchtwagenID).Scan(&standort.PLZ, &standort.Ort)
+	if errors.Is(err, pgx.ErrNoRows) {
+		return nil, nil
+	}
+	if err != nil {
+		return nil, err
+	}
+	return &standort, nil
+}
+
+func (r *PostgresGebrauchtwagenRepository) findHauptuntersuchung(ctx context.Context, gebrauchtwagenID int) (*domain.Hauptuntersuchung, error) {
+	var hu domain.Hauptuntersuchung
+	err := r.db.QueryRow(ctx, `
+		SELECT pruefdatum::text, gueltig_bis::text, prueforganisation, status::text
+		FROM gebrauchtwagen.hauptuntersuchung
+		WHERE gebrauchtwagen_id = $1`, gebrauchtwagenID).Scan(&hu.Pruefdatum, &hu.GueltigBis, &hu.Prueforganisation, &hu.Status)
+	if errors.Is(err, pgx.ErrNoRows) {
+		return nil, nil
+	}
+	if err != nil {
+		return nil, err
+	}
+	return &hu, nil
+}
+
+func (r *PostgresGebrauchtwagenRepository) findSchaeden(ctx context.Context, gebrauchtwagenID int) ([]domain.Schaden, error) {
+	rows, err := r.db.Query(ctx, `
+		SELECT bezeichnung, beschreibung, feststellungsdatum::text
+		FROM gebrauchtwagen.schaden
+		WHERE gebrauchtwagen_id = $1
+		ORDER BY id`, gebrauchtwagenID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	return pgx.CollectRows(rows, pgx.RowToStructByPos[domain.Schaden])
 }
 
 func (r *PostgresGebrauchtwagenRepository) Update(ctx context.Context, id int, expectedVersion int, input domain.GebrauchtwagenWrite) (domain.Gebrauchtwagen, error) {

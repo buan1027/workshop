@@ -30,6 +30,22 @@ func (f *fakeGebrauchtwagenRepository) FindByID(_ context.Context, id int) (doma
 	return domain.Gebrauchtwagen{}, domain.ErrNotFound
 }
 
+func (f *fakeGebrauchtwagenRepository) FindDetailByID(ctx context.Context, id int) (domain.GebrauchtwagenDetail, error) {
+	item, err := f.FindByID(ctx, id)
+	if err != nil {
+		return domain.GebrauchtwagenDetail{}, err
+	}
+	return domain.GebrauchtwagenDetail{
+		Gebrauchtwagen: item,
+		Standort:       &domain.Standort{PLZ: "76131", Ort: "Karlsruhe"},
+		Schaeden: []domain.Schaden{{
+			Bezeichnung:        "Kratzer",
+			Beschreibung:       "Kleiner Lackkratzer",
+			Feststellungsdatum: "2024-11-10",
+		}},
+	}, nil
+}
+
 func (f *fakeGebrauchtwagenRepository) Create(_ context.Context, input domain.GebrauchtwagenWrite) (domain.Gebrauchtwagen, error) {
 	item := domain.Gebrauchtwagen{
 		ID:             len(f.items) + 1,
@@ -134,6 +150,9 @@ func TestDetailReturnsETag(t *testing.T) {
 	}
 	if etag := response.Header().Get("ETag"); etag != `"3"` {
 		t.Fatalf("expected ETag \"3\", got %q", etag)
+	}
+	if !strings.Contains(response.Body.String(), `"standort"`) {
+		t.Fatalf("expected detail response to contain relation data, got %s", response.Body.String())
 	}
 }
 

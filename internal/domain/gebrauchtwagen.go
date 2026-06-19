@@ -16,6 +16,31 @@ type Gebrauchtwagen struct {
 	Version        int    `json:"version"`
 }
 
+type GebrauchtwagenDetail struct {
+	Gebrauchtwagen
+	Standort          *Standort          `json:"standort,omitempty"`
+	Hauptuntersuchung *Hauptuntersuchung `json:"hauptuntersuchung,omitempty"`
+	Schaeden          []Schaden          `json:"schaeden"`
+}
+
+type Standort struct {
+	PLZ string `json:"plz"`
+	Ort string `json:"ort"`
+}
+
+type Hauptuntersuchung struct {
+	Pruefdatum        string `json:"pruefdatum"`
+	GueltigBis        string `json:"gueltigBis"`
+	Prueforganisation string `json:"prueforganisation"`
+	Status            string `json:"status"`
+}
+
+type Schaden struct {
+	Bezeichnung        string `json:"bezeichnung"`
+	Beschreibung       string `json:"beschreibung"`
+	Feststellungsdatum string `json:"feststellungsdatum"`
+}
+
 type GebrauchtwagenWrite struct {
 	Marke          string `json:"marke"`
 	Modell         string `json:"modell"`

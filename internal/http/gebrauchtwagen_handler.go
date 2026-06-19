@@ -50,7 +50,7 @@ func (h GebrauchtwagenHandler) Detail(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	item, err := h.Repository.FindByID(r.Context(), id)
+	item, err := h.Repository.FindDetailByID(r.Context(), id)
 	if errors.Is(err, domain.ErrNotFound) {
 		writeProblem(w, http.StatusNotFound, fmt.Sprintf("Kein Gebrauchtwagen mit id=%d gefunden", id))
 		return
