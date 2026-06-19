@@ -157,6 +157,39 @@ func TestCreateGebrauchtwagenRejectsInvalidInput(t *testing.T) {
 	}
 }
 
+func TestCreateRequiresAdminTokenWhenConfigured(t *testing.T) {
+	router := NewRouter(Dependencies{
+		Repository: &fakeGebrauchtwagenRepository{},
+		AdminToken: "secret",
+	})
+	body := `{"marke":"VW","modell":"Golf","fahrzeugklasse":"KOMPAKTKLASSE","kraftstoffart":"BENZIN","schadenfrei":true,"kilometerstand":12000}`
+	response := httptest.NewRecorder()
+	request := httptest.NewRequest(http.MethodPost, "/api/gebrauchtwagen/", strings.NewReader(body))
+
+	router.ServeHTTP(response, request)
+
+	if response.Code != http.StatusUnauthorized {
+		t.Fatalf("expected status 401, got %d", response.Code)
+	}
+}
+
+func TestCreateAcceptsConfiguredAdminToken(t *testing.T) {
+	router := NewRouter(Dependencies{
+		Repository: &fakeGebrauchtwagenRepository{},
+		AdminToken: "secret",
+	})
+	body := `{"marke":"VW","modell":"Golf","fahrzeugklasse":"KOMPAKTKLASSE","kraftstoffart":"BENZIN","schadenfrei":true,"kilometerstand":12000}`
+	response := httptest.NewRecorder()
+	request := httptest.NewRequest(http.MethodPost, "/api/gebrauchtwagen/", strings.NewReader(body))
+	request.Header.Set("Authorization", "Bearer secret")
+
+	router.ServeHTTP(response, request)
+
+	if response.Code != http.StatusCreated {
+		t.Fatalf("expected status 201, got %d", response.Code)
+	}
+}
+
 func TestListRejectsUnknownQueryParameter(t *testing.T) {
 	router := NewRouter(Dependencies{Repository: &fakeGebrauchtwagenRepository{}})
 	response := httptest.NewRecorder()

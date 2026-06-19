@@ -47,7 +47,7 @@ Begruendung: Das Datenbankschema existiert bereits. Direkte SQL-Queries sind tra
 - Nicht umgesetzt.
 - Stattdessen gibt es optional `ADMIN_TOKEN`: Wenn gesetzt, brauchen schreibende Endpunkte `Authorization: Bearer <token>`.
 
-Begruendung: Keycloak war optional und haette in vier Stunden zu viel Zeit vom Kernserver abgezogen.
+Begruendung: Keycloak war optional und haette in vier Stunden zu viel Zeit vom Kernserver abgezogen. Der einfache Token-Schutz ist kein vollwertiger OIDC-Ersatz, zeigt aber, wo Security-Middleware im Server sitzt.
 
 ### Einfacher Integrationstest
 

@@ -81,7 +81,24 @@ Invoke-WebRequest http://localhost:3000/api/gebrauchtwagen `
 Erwartung: Status `201 Created` und ein `Location`-Header, z.B. `/api/gebrauchtwagen/4`.
 Die Antwort enthaelt ausserdem den erstellten Datensatz und einen `ETag`.
 
-## 9. Update mit Version zeigen
+## 9. Optionalen Schreibschutz zeigen
+
+Server mit Token starten:
+
+```powershell
+$env:ADMIN_TOKEN="secret"
+go run ./cmd/server
+```
+
+Schreibende Requests brauchen dann:
+
+```powershell
+-Headers @{ "Authorization" = "Bearer secret" }
+```
+
+Ohne Header antworten `POST`, `PUT` und `DELETE` mit `401 Unauthorized`.
+
+## 10. Update mit Version zeigen
 
 Erst Detail abrufen und `ETag` merken:
 
