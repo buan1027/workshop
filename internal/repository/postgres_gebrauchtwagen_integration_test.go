@@ -76,3 +76,33 @@ func TestPostgresGebrauchtwagenRepositoryCRUD(t *testing.T) {
 		t.Fatalf("expected not found after delete, got %v", err)
 	}
 }
+
+func TestPostgresGebrauchtwagenRepositoryFindsDetailRelations(t *testing.T) {
+	databaseURL := os.Getenv("INTEGRATION_DATABASE_URL")
+	if databaseURL == "" {
+		t.Skip("INTEGRATION_DATABASE_URL is not set")
+	}
+
+	ctx := context.Background()
+	pool, err := pgxpool.New(ctx, databaseURL)
+	if err != nil {
+		t.Fatalf("create pool: %v", err)
+	}
+	defer pool.Close()
+
+	repo := NewPostgresGebrauchtwagenRepository(pool)
+	detail, err := repo.FindDetailByID(ctx, 1)
+	if err != nil {
+		t.Fatalf("find detail: %v", err)
+	}
+
+	if detail.Standort == nil || detail.Standort.Ort != "Karlsruhe" {
+		t.Fatalf("expected Standort Karlsruhe, got %+v", detail.Standort)
+	}
+	if detail.Hauptuntersuchung == nil || detail.Hauptuntersuchung.Status != "BESTANDEN" {
+		t.Fatalf("expected bestandene Hauptuntersuchung, got %+v", detail.Hauptuntersuchung)
+	}
+	if detail.Schaeden == nil {
+		t.Fatal("expected schaeden slice to be initialized")
+	}
+}
