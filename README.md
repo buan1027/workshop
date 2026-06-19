@@ -121,6 +121,7 @@ go test ./...
 ```
 
 Die vorhandenen Tests pruefen Validierung, Healthcheck, Create, Detail mit ETag und Fehlerfaelle. Die HTTP-Tests nutzen ein Fake-Repository und brauchen keine echte Datenbank.
+Auf GitHub fuehrt der Workflow `.github/workflows/go.yml` Formatpruefung und Tests automatisch aus.
 
 Optionaler Integrationstest gegen PostgreSQL:
 
