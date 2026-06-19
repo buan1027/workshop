@@ -15,6 +15,7 @@ https://github.com/buan1027/workshop
 ### Agenten
 
 - Codex im lokalen Workspace `C:\Users\anna\dev\workshop`.
+- Arbeitsweise: iterativ, mit kleinen Commits nach dem Prinzip "Commit early, commit often".
 
 ### Chat-URLs
 
@@ -29,11 +30,27 @@ https://github.com/buan1027/workshop
 
 Begruendung: `chi` ist leichtgewichtig, gut dokumentiert und bleibt nah an idiomatischem Go. Dadurch ist die Loesung im Workshop gut erklaerbar.
 
+Umgesetzt wurden Healthchecks sowie CRUD-Endpunkte fuer die Hauptressource `Gebrauchtwagen`:
+
+```text
+GET    /health/liveness
+GET    /health/readiness
+GET    /api/gebrauchtwagen
+GET    /api/gebrauchtwagen/{id}
+POST   /api/gebrauchtwagen
+PUT    /api/gebrauchtwagen/{id}
+DELETE /api/gebrauchtwagen/{id}
+```
+
+Die Listenabfrage unterstuetzt Filter und Paging mit `page`, `size` und `count-only`.
+
 ### Validierung (nur Neuanlegen)
 
 - Manuelle Validierung in `internal/domain`, aufgerufen aus `internal/service`.
 
 Begruendung: Fuer das kleine Datenmodell sind klare eigene Regeln einfacher zu erklaeren als ein zusaetzliches Validation-Framework. Validiert werden Pflichtfelder, die 17-stellige FIN, Enum-Werte, Datumsfelder, `kilometerstand >= 0` und optionale Relationsdaten. Die Service-Schicht fuehrt diese Validierung aus, bevor das Repository PostgreSQL aufruft.
+
+Hinweis: Die Aufgabenstellung nennt "nur Neuanlegen". Im Server wird dieselbe fachliche Validierung auch fuer `PUT` wiederverwendet, weil Updates sonst inkonsistente Daten erzeugen koennten.
 
 ### OR-Mapping (fuer PostgreSQL)
 
@@ -54,12 +71,20 @@ Begruendung: Keycloak war optional. Deshalb ist die Integration bewusst abschalt
 ### Einfacher Integrationstest
 
 - Unit-/Handler-Tests laufen mit `go test ./...`.
-- Optionaler PostgreSQL-Integrationstest:
+- Optionaler PostgreSQL-Integrationstest gegen eine echte laufende Datenbank:
 
 ```powershell
 $env:INTEGRATION_DATABASE_URL="postgres://gebrauchtwagen:gebrauchtwagen@localhost:5432/gebrauchtwagen?sslmode=disable"
 go test ./internal/repository
 ```
+
+Getestet werden unter anderem:
+
+- Validierung der fachlichen Eingaben
+- Healthcheck-Handler
+- REST-Create, Detailantwort, ETag, `If-None-Match` und `If-Match`
+- Paging-Metadaten und ungueltige Paging-Parameter
+- PostgreSQL-CRUD, relationale Detaildaten und echte Limit-/Offset-Paginierung
 
 ### Demo-Daten
 
@@ -90,8 +115,16 @@ Lokal gebuendelt in:
 ### Bruno
 
 - Manuelle REST-Requests liegen in `bruno/`.
-- Die Umgebung `local` verwendet `baseUrl = http://localhost:3000`.
+- Die Umgebung `local` verwendet `baseUrl = http://127.0.0.1:3000`, damit das VS-Code-Bruno-Plugin lokal stabil aufloest.
 - Der optionale `adminToken` kann gesetzt werden, wenn der Server mit `ADMIN_TOKEN` gestartet wurde.
+
+### Weitere Artefakte
+
+- `README.md`: Start-, Test- und Architekturhinweise fuer die schnelle Nutzung.
+- `docs/architecture.md`: Kurzbeschreibung der Schichten.
+- `docs/demo-guide.md`: Vorfuehrablauf mit konkreten Requests.
+- `docs/openapi.yaml`: Schlanke OpenAPI-Beschreibung.
+- `.github/workflows/go.yml`: CI mit Formatierung, Analyse, Tests und Vulnerability-Check.
 
 ## Prompts/Requests an KI-Agent/en
 
@@ -100,3 +133,7 @@ Lokal gebuendelt in:
 - Empfohlene Loesung mit `chi` und `pgx` umsetzen.
 - Projektstruktur, CRUD-Endpunkte, Fehlerbehandlung, Tests, Docker-Setup und README erstellen.
 - OpenAPI-Beschreibung und Demo-Ablauf fuer die Abgabe dokumentieren.
+- Reales PostgreSQL-Backend und automatisches Neuladen der Demo-Daten umsetzen.
+- Optimistische Synchronisation mit `version`, `ETag` und `If-Match` pruefen.
+- Paging explizit fuer REST und PostgreSQL testen.
+- Optionale Keycloak/OIDC-Authentifizierung so vorbereiten, dass der Server ohne Keycloak weiter funktioniert.

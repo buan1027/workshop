@@ -7,6 +7,8 @@ Go-REST-Server fuer das Gebrauchtwagen-Datenmodell aus dem Softwareengineering-W
 Der Server stellt eine einfache REST-API fuer die Hauptressource `Gebrauchtwagen` bereit. Er ist bewusst klein gehalten: klare Schichten, direkte PostgreSQL-Anbindung und gut erklaerbare Validierung.
 Der HTTP-Server verwendet konservative Timeouts und beendet sich bei `Ctrl+C` geordnet.
 
+Dieses Repository ist das Ergebnis des Programmierworkshops am 19.6.2026. Die abgabeorientierte Zusammenfassung nach Vorgabe liegt in `docs/workshop-abgabe.md`.
+
 ## Tech Stack
 
 - Go mit `net/http` als Basis
@@ -23,7 +25,10 @@ cmd/server/              Einstiegspunkt des Servers
 internal/config/         Konfiguration ueber Umgebungsvariablen
 internal/domain/         Datenmodell, Validierung, fachliche Fehler
 internal/http/           Router, Handler, Problem-Details
+internal/service/        Use Cases und Aufruf der fachlichen Validierung
 internal/repository/     Repository-Interface und PostgreSQL-Implementierung
+internal/database/       Eingebettetes SQL zum Zuruecksetzen der Demo-Daten
+internal/auth/           Optionaler Schreibschutz mit ADMIN_TOKEN oder Keycloak/OIDC
 ```
 
 Eine ausfuehrlichere Architekturbeschreibung liegt in `docs/architecture.md`.
@@ -100,6 +105,14 @@ Filter fuer die Liste:
 marke, modell, fahrzeugklasse, kraftstoffart, schadenfrei, page, size, count-only
 ```
 
+Paging-Beispiel:
+
+```powershell
+Invoke-RestMethod "http://localhost:3000/api/gebrauchtwagen?page=1&size=2"
+```
+
+Die Antwort enthaelt `data`, `total`, `page` und `size`.
+
 Beispiel fuer Neuanlage:
 
 ```powershell
@@ -140,7 +153,7 @@ Die optimistische Synchronisation erfolgt ueber die Spalte `version` und ETags w
 go test ./...
 ```
 
-Die vorhandenen Tests pruefen Validierung, Healthcheck, Create, Detail mit ETag und Fehlerfaelle. Die HTTP-Tests nutzen bewusst ein Fake-Repository, damit Handler-Fehler schnell und isoliert getestet werden koennen. Der produktive Serverpfad nutzt dagegen immer `pgx` und PostgreSQL.
+Die vorhandenen Tests pruefen Validierung, Healthcheck, Create, Detail mit ETag, optimistische Versionierung, Paging und Fehlerfaelle. Die HTTP-Tests nutzen bewusst ein Fake-Repository, damit Handler-Fehler schnell und isoliert getestet werden koennen. Der produktive Serverpfad nutzt dagegen immer `pgx` und PostgreSQL.
 Auf GitHub fuehrt der Workflow `.github/workflows/go.yml` Formatpruefung und Tests automatisch aus.
 
 ## Linting und statische Analyse
@@ -229,13 +242,17 @@ docker run --rm -p 3000:3000 `
 Umgesetzt:
 
 - REST-Endpunkte fuer Healthchecks und Gebrauchtwagen-CRUD
+- Suche mit Filtern, Paging und `count-only`
 - Detailantwort mit `Standort`, `Schaden` und `Hauptuntersuchung`
 - Neuanlage mit optionalen relationalen Daten in einer Transaktion
 - Automatisches Zuruecksetzen der Demo-Daten beim Serverstart
+- Optimistische Synchronisation mit `version`, `ETag`, `If-None-Match` und `If-Match`
+- Optionaler Schreibschutz mit `ADMIN_TOKEN` oder Keycloak/OIDC
 - Unit-, Handler- und optionale PostgreSQL-Integrationstests
 - Dockerfile, Docker Compose, Bruno-Collection, OpenAPI-Beschreibung und GitHub Actions
 - Linting und statische Analyse mit `gofmt`, `go vet`, `staticcheck` und `govulncheck`
 
 Optional, falls noch Zeit bleibt:
 
-- Keycloak/OIDC als vollwertiger Ersatz fuer den einfachen `ADMIN_TOKEN`-Schreibschutz
+- Vollstaendiger Keycloak-Test inklusive Realm-/Client-/User-Export fuer reproduzierbare Imports
+- Ausfuehrlicher Image-Scan, z.B. Trivy oder OWASP Dependency Check im CI
