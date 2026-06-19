@@ -75,8 +75,9 @@ Lokal gebuendelt in:
 ### Bruno
 
 - Manuelle REST-Requests liegen in `bruno/`.
-- Die Umgebung `local` verwendet `baseUrl = http://localhost:3000`.
-- Der optionale `adminToken` kann gesetzt werden, wenn der Server mit `ADMIN_TOKEN` gestartet wurde.
+- `baseUrl` ist in `bruno/collection.bru` auf `http://localhost:3000` voreingestellt.
+- Die Umgebung `local` kann `baseUrl` und den optionalen `adminToken` ueberschreiben.
+- `adminToken` kann gesetzt werden, wenn der Server mit `ADMIN_TOKEN` gestartet wurde.
 
 ## Prompts/Requests an KI-Agent/en
 
