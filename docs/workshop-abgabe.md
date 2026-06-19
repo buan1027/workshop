@@ -39,8 +39,9 @@ Begruendung: Fuer das kleine Datenmodell sind klare eigene Regeln einfacher zu e
 
 - Kein klassisches ORM.
 - `github.com/jackc/pgx/v5` mit `pgxpool` fuer direkten PostgreSQL-Zugriff.
+- Echtes PostgreSQL-Backend ueber Docker Compose (`postgres:17`) mit Schema- und Seed-Skripten.
 
-Begruendung: Das Datenbankschema existiert bereits. Direkte SQL-Queries sind transparent, schnell umzusetzen und vermeiden Mapping-Probleme mit PostgreSQL-Enums.
+Begruendung: Das Datenbankschema existiert bereits. Direkte SQL-Queries sind transparent, schnell umzusetzen und vermeiden Mapping-Probleme mit PostgreSQL-Enums. Damit entspricht der Server dem DB-Server-Ansatz aus den vorherigen Abgaben, ohne fuer den Workshop zusaetzliche ORM-Komplexitaet einzufuehren.
 
 ### Optional: OIDC mit Keycloak
 

@@ -61,6 +61,8 @@ Lokale PostgreSQL-Datenbank starten:
 docker compose -f extras/compose/postgres/compose.yml up -d
 ```
 
+Das ist kein Mock und keine In-Memory-Datenbank: Der Compose-Stack startet einen echten `postgres:17`-Container. Das Schema und die Beispieldaten werden beim ersten Start aus `extras/compose/postgres/init/` geladen.
+
 Kompletten Docker-Stack mit App starten:
 
 ```powershell
@@ -130,7 +132,7 @@ Fehler werden als `application/problem+json` zurueckgegeben. Beispiele:
 go test ./...
 ```
 
-Die vorhandenen Tests pruefen Validierung, Healthcheck, Create, Detail mit ETag und Fehlerfaelle. Die HTTP-Tests nutzen ein Fake-Repository und brauchen keine echte Datenbank.
+Die vorhandenen Tests pruefen Validierung, Healthcheck, Create, Detail mit ETag und Fehlerfaelle. Die HTTP-Tests nutzen bewusst ein Fake-Repository, damit Handler-Fehler schnell und isoliert getestet werden koennen. Der produktive Serverpfad nutzt dagegen immer `pgx` und PostgreSQL.
 Auf GitHub fuehrt der Workflow `.github/workflows/go.yml` Formatpruefung und Tests automatisch aus.
 
 ## Linting und statische Analyse

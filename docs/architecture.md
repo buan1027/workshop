@@ -33,6 +33,10 @@ Das ist fuer den Workshop ein guter Kompromiss: keine zusaetzliche Validation-Li
 
 ## Datenbankzugriff
 
+Der produktive Server verwendet einen echten PostgreSQL-Server. Lokal wird dieser ueber Docker Compose als `postgres:17` gestartet; Schema und Seed-Daten liegen in `extras/compose/postgres/init/`.
+
+Im Code erzeugt `cmd/server` aus `DATABASE_URL` einen `pgxpool.Pool` und uebergibt ihn an `PostgresGebrauchtwagenRepository`. Es gibt deshalb im laufenden Server keinen In-Memory-Speicher und kein Fake-Backend. Fakes werden nur in Handler-Tests eingesetzt.
+
 Der Server verwendet `pgx` statt ORM. Das passt hier gut, weil das PostgreSQL-Schema bereits vorhanden ist und PostgreSQL-Enums direkt genutzt werden. Die Neuanlage eines Fahrzeugs mit optionalem Standort, Hauptuntersuchung und Schaeden erfolgt transaktional.
 
 ## Fehlerbehandlung
