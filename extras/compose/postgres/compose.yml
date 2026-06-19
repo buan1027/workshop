@@ -15,7 +15,10 @@ services:
       APP_ADDR: ":3000"
       DATABASE_URL: postgres://gebrauchtwagen:gebrauchtwagen@db:5432/gebrauchtwagen?sslmode=disable
       RESET_DATABASE_ON_START: "${RESET_DATABASE_ON_START:-true}"
+      AUTH_MODE: "${AUTH_MODE:-admin-token}"
       ADMIN_TOKEN: ${ADMIN_TOKEN:-}
+      KEYCLOAK_ISSUER_URL: ${KEYCLOAK_ISSUER_URL:-}
+      KEYCLOAK_CLIENT_ID: ${KEYCLOAK_CLIENT_ID:-}
     ports:
       - "${APP_PORT:-3000}:3000"
 

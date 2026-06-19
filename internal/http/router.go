@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/buan1027/workshop/internal/auth"
 	"github.com/buan1027/workshop/internal/repository"
 	"github.com/buan1027/workshop/internal/service"
 	"github.com/go-chi/chi/v5"
@@ -16,6 +17,7 @@ type Dependencies struct {
 	DB         *pgxpool.Pool
 	Repository repository.GebrauchtwagenRepository
 	Service    service.GebrauchtwagenService
+	Authorizer auth.Authorizer
 	AdminToken string
 	Logger     *slog.Logger
 }
@@ -34,7 +36,11 @@ func NewRouter(deps Dependencies) http.Handler {
 	if apiService == nil {
 		apiService = service.NewGebrauchtwagenService(deps.Repository)
 	}
-	api := GebrauchtwagenHandler{Service: apiService, AdminToken: deps.AdminToken}
+	authorizer := deps.Authorizer
+	if authorizer == nil {
+		authorizer = auth.NewAdminTokenAuthorizer(deps.AdminToken)
+	}
+	api := GebrauchtwagenHandler{Service: apiService, Authorizer: authorizer}
 
 	r.Get("/", func(w http.ResponseWriter, r *http.Request) {
 		writeJSON(w, http.StatusOK, map[string]string{"service": "workshop-server"})

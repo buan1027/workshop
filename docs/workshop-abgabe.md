@@ -45,10 +45,11 @@ Begruendung: Das Datenbankschema existiert bereits. Direkte SQL-Queries sind tra
 
 ### Optional: OIDC mit Keycloak
 
-- Nicht umgesetzt.
-- Stattdessen gibt es optional `ADMIN_TOKEN`: Wenn gesetzt, brauchen schreibende Endpunkte `Authorization: Bearer <token>`.
+- Optional vorbereitet.
+- Standard ist weiterhin der einfache `ADMIN_TOKEN`: Wenn gesetzt, brauchen schreibende Endpunkte `Authorization: Bearer <token>`.
+- Mit `AUTH_MODE=keycloak` prueft der Server Bearer Tokens ueber OpenID Connect gegen `KEYCLOAK_ISSUER_URL`.
 
-Begruendung: Keycloak war optional und haette in vier Stunden zu viel Zeit vom Kernserver abgezogen. Der einfache Token-Schutz ist kein vollwertiger OIDC-Ersatz, zeigt aber, wo Security-Middleware im Server sitzt.
+Begruendung: Keycloak war optional. Deshalb ist die Integration bewusst abschaltbar und faellt bei fehlender Keycloak-Konfiguration auf den stabilen `ADMIN_TOKEN`-Modus zurueck, damit der Kernserver im Workshop weiter lauffaehig bleibt.
 
 ### Einfacher Integrationstest
 

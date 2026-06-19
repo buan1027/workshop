@@ -10,6 +10,9 @@ func TestLoadDefaultsToResetDatabaseOnStart(t *testing.T) {
 	if !cfg.ResetDatabaseOnStart {
 		t.Fatal("expected reset database on start to be enabled by default")
 	}
+	if cfg.AuthMode != "admin-token" {
+		t.Fatalf("expected admin-token auth mode by default, got %q", cfg.AuthMode)
+	}
 }
 
 func TestLoadCanDisableResetDatabaseOnStart(t *testing.T) {

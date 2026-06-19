@@ -10,6 +10,7 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/buan1027/workshop/internal/auth"
 	"github.com/buan1027/workshop/internal/config"
 	"github.com/buan1027/workshop/internal/database"
 	httpapi "github.com/buan1027/workshop/internal/http"
@@ -44,11 +45,12 @@ func main() {
 
 	repo := repository.NewPostgresGebrauchtwagenRepository(pool)
 	gebrauchtwagenService := service.NewGebrauchtwagenService(repo)
+	authorizer := buildAuthorizer(ctx, cfg, logger)
 	handler := httpapi.NewRouter(httpapi.Dependencies{
 		DB:         pool,
 		Repository: repo,
 		Service:    gebrauchtwagenService,
-		AdminToken: cfg.AdminToken,
+		Authorizer: authorizer,
 		Logger:     logger,
 	})
 
@@ -76,4 +78,28 @@ func main() {
 		logger.Error("graceful shutdown failed", "error", err)
 		os.Exit(1)
 	}
+}
+
+func buildAuthorizer(ctx context.Context, cfg config.Config, logger *slog.Logger) auth.Authorizer {
+	fallback := auth.NewAdminTokenAuthorizer(cfg.AdminToken)
+	if cfg.AuthMode != "keycloak" {
+		return fallback
+	}
+
+	if cfg.KeycloakIssuerURL == "" {
+		logger.Warn("keycloak auth mode configured without issuer url; falling back to admin token")
+		return fallback
+	}
+
+	keycloak, err := auth.NewKeycloakAuthorizer(ctx, auth.KeycloakConfig{
+		IssuerURL: cfg.KeycloakIssuerURL,
+		ClientID:  cfg.KeycloakClientID,
+	})
+	if err != nil {
+		logger.Warn("keycloak authorizer could not be initialized; falling back to admin token", "error", err)
+		return fallback
+	}
+
+	logger.Info("keycloak authorizer enabled", "issuer", cfg.KeycloakIssuerURL, "clientId", cfg.KeycloakClientID)
+	return keycloak
 }

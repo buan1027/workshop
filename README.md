@@ -37,7 +37,10 @@ Wichtige Variablen:
 - `APP_ADDR`: HTTP-Adresse, Standard `:3000`
 - `DATABASE_URL`: PostgreSQL-Verbindung
 - `RESET_DATABASE_ON_START`: setzt Demo-Daten beim Serverstart neu, Standard `true`
+- `AUTH_MODE`: Authentifizierungsmodus fuer schreibende Endpunkte, Standard `admin-token`
 - `ADMIN_TOKEN`: optionaler Bearer Token fuer schreibende Endpunkte
+- `KEYCLOAK_ISSUER_URL`: optionaler Keycloak-Issuer fuer `AUTH_MODE=keycloak`
+- `KEYCLOAK_CLIENT_ID`: optionale Audience-Pruefung fuer `AUTH_MODE=keycloak`
 
 Beispiel:
 
@@ -192,6 +195,25 @@ Invoke-RestMethod http://localhost:3000/api/gebrauchtwagen
 ```
 
 Wenn `ADMIN_TOKEN` gesetzt ist, brauchen `POST`, `PUT` und `DELETE` den Header `Authorization: Bearer <token>`.
+
+## Authentifizierung
+
+Standardmaessig bleibt der Server workshop-freundlich lauffaehig:
+
+- Ohne `ADMIN_TOKEN` sind schreibende Endpunkte offen.
+- Mit `ADMIN_TOKEN` brauchen `POST`, `PUT` und `DELETE` den passenden Bearer Token.
+- Mit `AUTH_MODE=keycloak` prueft der Server Bearer Tokens gegen `KEYCLOAK_ISSUER_URL`.
+
+Wenn `AUTH_MODE=keycloak` gesetzt ist, aber Keycloak nicht erreichbar oder nicht konfiguriert ist, startet der Server weiter und faellt sichtbar geloggt auf den `ADMIN_TOKEN`-Modus zurueck. Fuer Produktivbetrieb waere ein harter Fehler sinnvoller; fuer den Workshop bleibt so der Kernserver benutzbar.
+
+Beispiel fuer Keycloak:
+
+```powershell
+$env:AUTH_MODE="keycloak"
+$env:KEYCLOAK_ISSUER_URL="http://localhost:8080/realms/gebrauchtwagen"
+$env:KEYCLOAK_CLIENT_ID="workshop-server"
+go run ./cmd/server
+```
 
 ## Docker-Image
 

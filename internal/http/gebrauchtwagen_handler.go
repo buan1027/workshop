@@ -8,6 +8,7 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/buan1027/workshop/internal/auth"
 	"github.com/buan1027/workshop/internal/domain"
 	"github.com/buan1027/workshop/internal/repository"
 	"github.com/buan1027/workshop/internal/service"
@@ -32,7 +33,7 @@ var allowedSearchParams = map[string]bool{
 
 type GebrauchtwagenHandler struct {
 	Service    service.GebrauchtwagenService
-	AdminToken string
+	Authorizer auth.Authorizer
 }
 
 func (h GebrauchtwagenHandler) List(w http.ResponseWriter, r *http.Request) {
@@ -179,11 +180,11 @@ func (h GebrauchtwagenHandler) Delete(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h GebrauchtwagenHandler) requireWriteAccess(w http.ResponseWriter, r *http.Request) bool {
-	if h.AdminToken == "" {
+	if h.Authorizer == nil {
 		return true
 	}
 
-	if r.Header.Get("Authorization") != "Bearer "+h.AdminToken {
+	if err := h.Authorizer.Authorize(r.Context(), r.Header.Get("Authorization")); err != nil {
 		writeProblem(w, http.StatusUnauthorized, "gueltiger Bearer Token erforderlich")
 		return false
 	}
