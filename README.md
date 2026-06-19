@@ -5,6 +5,7 @@ Go-REST-Server fuer das Gebrauchtwagen-Datenmodell aus dem Softwareengineering-W
 ## Ziel
 
 Der Server stellt eine einfache REST-API fuer die Hauptressource `Gebrauchtwagen` bereit. Er ist bewusst klein gehalten: klare Schichten, direkte PostgreSQL-Anbindung und gut erklaerbare Validierung.
+Der HTTP-Server verwendet konservative Timeouts und beendet sich bei `Ctrl+C` geordnet.
 
 ## Tech Stack
 
