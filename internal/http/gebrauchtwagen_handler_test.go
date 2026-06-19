@@ -103,6 +103,21 @@ func TestLiveness(t *testing.T) {
 	}
 }
 
+func TestOptionsReturnsCORSHeaders(t *testing.T) {
+	router := NewRouter(Dependencies{Repository: &fakeGebrauchtwagenRepository{}})
+	response := httptest.NewRecorder()
+	request := httptest.NewRequest(http.MethodOptions, "/api/gebrauchtwagen", nil)
+
+	router.ServeHTTP(response, request)
+
+	if response.Code != http.StatusNoContent {
+		t.Fatalf("expected status 204, got %d", response.Code)
+	}
+	if allowOrigin := response.Header().Get("Access-Control-Allow-Origin"); allowOrigin != "*" {
+		t.Fatalf("expected wildcard CORS origin, got %q", allowOrigin)
+	}
+}
+
 func TestCreateGebrauchtwagen(t *testing.T) {
 	repo := &fakeGebrauchtwagenRepository{}
 	router := NewRouter(Dependencies{Repository: repo})
