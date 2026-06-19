@@ -1,0 +1,46 @@
+@baseUrl = http://localhost:3000
+
+### Liveness
+GET {{baseUrl}}/health/liveness
+
+### Readiness
+GET {{baseUrl}}/health/readiness
+
+### Liste
+GET {{baseUrl}}/api/gebrauchtwagen
+
+### Liste filtern
+GET {{baseUrl}}/api/gebrauchtwagen?marke=vw&size=10
+
+### Detail
+GET {{baseUrl}}/api/gebrauchtwagen/1
+
+### Create
+POST {{baseUrl}}/api/gebrauchtwagen
+Content-Type: application/json
+
+{
+  "marke": "Mercedes",
+  "modell": "C 200",
+  "fahrzeugklasse": "MITTELKLASSE",
+  "kraftstoffart": "BENZIN",
+  "schadenfrei": true,
+  "kilometerstand": 18000
+}
+
+### Update mit ETag-Version
+PUT {{baseUrl}}/api/gebrauchtwagen/1
+Content-Type: application/json
+If-Match: "1"
+
+{
+  "marke": "VW",
+  "modell": "Golf Variant",
+  "fahrzeugklasse": "KOMBI",
+  "kraftstoffart": "BENZIN",
+  "schadenfrei": true,
+  "kilometerstand": 43000
+}
+
+### Delete
+DELETE {{baseUrl}}/api/gebrauchtwagen/1

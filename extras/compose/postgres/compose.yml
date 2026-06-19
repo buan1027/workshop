@@ -1,0 +1,19 @@
+name: workshop-gebrauchtwagen
+
+services:
+  db:
+    image: postgres:17
+    container_name: workshop-gebrauchtwagen-db
+    environment:
+      POSTGRES_DB: gebrauchtwagen
+      POSTGRES_USER: gebrauchtwagen
+      POSTGRES_PASSWORD: gebrauchtwagen
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./init:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U gebrauchtwagen -d gebrauchtwagen"]
+      interval: 10s
+      timeout: 5s
+      retries: 5

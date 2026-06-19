@@ -18,6 +18,9 @@ build/
 .pytest_cache/
 .ruff_cache/
 .mypy_cache/
+.gocache/
+.server*.log
+bin/
 
 # OS/editor
 .DS_Store
