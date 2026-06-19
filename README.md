@@ -59,6 +59,12 @@ Lokale PostgreSQL-Datenbank starten:
 docker compose -f extras/compose/postgres/compose.yml up -d
 ```
 
+Kompletten Docker-Stack mit App starten:
+
+```powershell
+docker compose -f extras/compose/postgres/compose.yml --profile app up -d --build
+```
+
 Healthcheck:
 
 ```powershell

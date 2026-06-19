@@ -33,6 +33,12 @@ go run ./cmd/server
 
 Erwartung: Die Konsole zeigt `server listening`.
 
+Alternativ kann der komplette Stack mit App gestartet werden:
+
+```powershell
+docker compose -f extras/compose/postgres/compose.yml --profile app up -d --build
+```
+
 ## 4. Healthchecks pruefen
 
 ```powershell
