@@ -11,6 +11,7 @@ import (
 	"time"
 
 	"github.com/buan1027/workshop/internal/config"
+	"github.com/buan1027/workshop/internal/database"
 	httpapi "github.com/buan1027/workshop/internal/http"
 	"github.com/buan1027/workshop/internal/repository"
 	"github.com/buan1027/workshop/internal/service"
@@ -30,6 +31,16 @@ func main() {
 		os.Exit(1)
 	}
 	defer pool.Close()
+
+	if cfg.ResetDatabaseOnStart {
+		seedCtx, cancel := context.WithTimeout(ctx, 10*time.Second)
+		defer cancel()
+		if err := database.ResetDemoData(seedCtx, pool); err != nil {
+			logger.Error("demo data could not be reset", "error", err)
+			os.Exit(1)
+		}
+		logger.Info("demo data reset")
+	}
 
 	repo := repository.NewPostgresGebrauchtwagenRepository(pool)
 	gebrauchtwagenService := service.NewGebrauchtwagenService(repo)

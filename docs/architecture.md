@@ -39,6 +39,12 @@ Im Code erzeugt `cmd/server` aus `DATABASE_URL` einen `pgxpool.Pool` und uebergi
 
 Der Server verwendet `pgx` statt ORM. Das passt hier gut, weil das PostgreSQL-Schema bereits vorhanden ist und PostgreSQL-Enums direkt genutzt werden. Die Neuanlage eines Fahrzeugs mit optionalem Standort, Hauptuntersuchung und Schaeden erfolgt transaktional.
 
+## Demo-Daten
+
+Beim Serverstart setzt die Anwendung den Demo-Datenbestand standardmaessig zurueck. Das ist fuer den Workshop praktisch, weil Tests und manuelle Requests nach jedem Neustart wieder denselben Ausgangszustand sehen. Technisch passiert das transaktional ueber `internal/database/demo_seed.sql`.
+
+Das Verhalten ist ueber `RESET_DATABASE_ON_START=false` abschaltbar. In einem echten Produktivbetrieb sollte dieser Wert deaktiviert sein.
+
 ## Fehlerbehandlung
 
 HTTP-Fehler werden als `application/problem+json` zurueckgegeben. Fachliche Fehler wie `ErrNotFound`, `ErrVersionConflict` und Validierungsfehler werden im Handler auf passende HTTP-Statuscodes abgebildet.

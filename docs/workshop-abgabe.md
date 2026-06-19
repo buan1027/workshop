@@ -60,6 +60,12 @@ $env:INTEGRATION_DATABASE_URL="postgres://gebrauchtwagen:gebrauchtwagen@localhos
 go test ./internal/repository
 ```
 
+### Demo-Daten
+
+- Beim Serverstart wird der Datenbestand standardmaessig neu befuellt.
+- Das entspricht dem Demo-Verhalten aus den vorherigen Abgaben.
+- Abschaltbar mit `RESET_DATABASE_ON_START=false`, falls Daten lokal erhalten bleiben sollen.
+
 ### Linting und statische Codeanalyse
 
 - `gofmt` fuer einheitliche Formatierung.

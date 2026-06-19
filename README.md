@@ -36,6 +36,7 @@ Wichtige Variablen:
 
 - `APP_ADDR`: HTTP-Adresse, Standard `:3000`
 - `DATABASE_URL`: PostgreSQL-Verbindung
+- `RESET_DATABASE_ON_START`: setzt Demo-Daten beim Serverstart neu, Standard `true`
 - `ADMIN_TOKEN`: optionaler Bearer Token fuer schreibende Endpunkte
 
 Beispiel:
@@ -43,6 +44,7 @@ Beispiel:
 ```powershell
 $env:APP_ADDR=":3000"
 $env:DATABASE_URL="postgres://gebrauchtwagen:gebrauchtwagen@localhost:5432/gebrauchtwagen?sslmode=disable"
+$env:RESET_DATABASE_ON_START="true"
 go run ./cmd/server
 ```
 
@@ -62,6 +64,7 @@ docker compose -f extras/compose/postgres/compose.yml up -d
 ```
 
 Das ist kein Mock und keine In-Memory-Datenbank: Der Compose-Stack startet einen echten `postgres:17`-Container. Das Schema und die Beispieldaten werden beim ersten Start aus `extras/compose/postgres/init/` geladen.
+Zusaetzlich setzt der Server beim Start standardmaessig den Demo-Datenbestand neu. Dadurch ist der Zustand nach jedem Serverstart wieder definiert, wie in den vorherigen Abgaben. Fuer laengerlebige lokale Daten kann das Verhalten mit `RESET_DATABASE_ON_START=false` deaktiviert werden.
 
 Kompletten Docker-Stack mit App starten:
 
@@ -157,6 +160,14 @@ Falls gerade kein Netzwerk verfuegbar ist:
 .\scripts\check.ps1 -SkipOnlineTools
 ```
 
+Abhaengigkeiten aktualisieren:
+
+```powershell
+go get -u ./...
+go mod tidy
+.\scripts\check.ps1
+```
+
 Optionaler Integrationstest gegen PostgreSQL:
 
 ```powershell
@@ -196,6 +207,7 @@ Umgesetzt:
 - REST-Endpunkte fuer Healthchecks und Gebrauchtwagen-CRUD
 - Detailantwort mit `Standort`, `Schaden` und `Hauptuntersuchung`
 - Neuanlage mit optionalen relationalen Daten in einer Transaktion
+- Automatisches Zuruecksetzen der Demo-Daten beim Serverstart
 - Unit-, Handler- und optionale PostgreSQL-Integrationstests
 - Dockerfile, Docker Compose, Bruno-Collection, OpenAPI-Beschreibung und GitHub Actions
 - Linting und statische Analyse mit `gofmt`, `go vet`, `staticcheck` und `govulncheck`
