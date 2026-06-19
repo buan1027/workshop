@@ -6,7 +6,7 @@ meta {
 
 post {
   url: {{keycloakUrl}}/realms/{{keycloakRealm}}/protocol/openid-connect/token
-  body: form-urlencoded
+  body: text
   auth: none
 }
 
@@ -14,11 +14,8 @@ headers {
   Content-Type: application/x-www-form-urlencoded
 }
 
-body:form-urlencoded {
-  grant_type: password
-  client_id: {{keycloakClientId}}
-  username: {{adminUsername}}
-  password: {{adminPassword}}
+body:text {
+  grant_type=password&client_id=workshop-server&username=admin&password=admin
 }
 
 script:post-response {
