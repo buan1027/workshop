@@ -1,0 +1,31 @@
+@startuml
+title Workshop Gebrauchtwagen Server - Komponenten
+
+skinparam componentStyle rectangle
+
+actor Client
+
+component "HTTP API\ninternal/http" as Http
+component "Service\ninternal/service" as Service
+component "Domain\ninternal/domain" as Domain
+component "Repository\ninternal/repository" as Repository
+database "PostgreSQL\nSchema gebrauchtwagen" as DB
+
+Client --> Http : REST/JSON
+Http --> Service : Use Cases
+Http --> Domain : HTTP-Parameter/DTOs
+Service --> Domain : Validierung/Fachfehler
+Service --> Repository : Persistenzoperationen
+Repository --> DB : SQL mit pgx
+
+note right of Service
+Create/Update validieren fachliche Regeln
+vor dem Zugriff auf PostgreSQL.
+end note
+
+note bottom of Repository
+Create speichert Fahrzeug und optionale
+Relationen in einer Transaktion.
+end note
+
+@enduml

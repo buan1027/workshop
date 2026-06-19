@@ -26,6 +26,8 @@ internal/http/           Router, Handler, Problem-Details
 internal/repository/     Repository-Interface und PostgreSQL-Implementierung
 ```
 
+Eine ausfuehrlichere Architekturbeschreibung liegt in `docs/architecture.md`.
+
 ## Konfiguration
 
 Siehe `.env.example`.

@@ -13,6 +13,7 @@ import (
 	"github.com/buan1027/workshop/internal/config"
 	httpapi "github.com/buan1027/workshop/internal/http"
 	"github.com/buan1027/workshop/internal/repository"
+	"github.com/buan1027/workshop/internal/service"
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
@@ -31,9 +32,11 @@ func main() {
 	defer pool.Close()
 
 	repo := repository.NewPostgresGebrauchtwagenRepository(pool)
+	gebrauchtwagenService := service.NewGebrauchtwagenService(repo)
 	handler := httpapi.NewRouter(httpapi.Dependencies{
 		DB:         pool,
 		Repository: repo,
+		Service:    gebrauchtwagenService,
 		AdminToken: cfg.AdminToken,
 		Logger:     logger,
 	})

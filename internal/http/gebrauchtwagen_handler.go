@@ -10,6 +10,7 @@ import (
 
 	"github.com/buan1027/workshop/internal/domain"
 	"github.com/buan1027/workshop/internal/repository"
+	"github.com/buan1027/workshop/internal/service"
 	"github.com/go-chi/chi/v5"
 )
 
@@ -30,7 +31,7 @@ var allowedSearchParams = map[string]bool{
 }
 
 type GebrauchtwagenHandler struct {
-	Repository repository.GebrauchtwagenRepository
+	Service    service.GebrauchtwagenService
 	AdminToken string
 }
 
@@ -41,7 +42,7 @@ func (h GebrauchtwagenHandler) List(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	page, err := h.Repository.List(r.Context(), search)
+	page, err := h.Service.List(r.Context(), search)
 	if err != nil {
 		writeProblem(w, http.StatusInternalServerError, "gebrauchtwagen konnten nicht gelesen werden")
 		return
@@ -61,7 +62,7 @@ func (h GebrauchtwagenHandler) Detail(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	item, err := h.Repository.FindDetailByID(r.Context(), id)
+	item, err := h.Service.FindDetailByID(r.Context(), id)
 	if errors.Is(err, domain.ErrNotFound) {
 		writeProblem(w, http.StatusNotFound, fmt.Sprintf("Kein Gebrauchtwagen mit id=%d gefunden", id))
 		return
@@ -91,7 +92,12 @@ func (h GebrauchtwagenHandler) Create(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	created, err := h.Repository.Create(r.Context(), input)
+	created, err := h.Service.Create(r.Context(), input)
+	var validationErr service.ValidationError
+	if errors.As(err, &validationErr) {
+		writeProblem(w, http.StatusUnprocessableEntity, validationErr.Problems)
+		return
+	}
 	if repository.IsUniqueViolation(err) {
 		writeProblem(w, http.StatusUnprocessableEntity, "fin ist bereits vorhanden")
 		return
@@ -126,7 +132,12 @@ func (h GebrauchtwagenHandler) Update(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	updated, err := h.Repository.Update(r.Context(), id, version, input)
+	updated, err := h.Service.Update(r.Context(), id, version, input)
+	var validationErr service.ValidationError
+	if errors.As(err, &validationErr) {
+		writeProblem(w, http.StatusUnprocessableEntity, validationErr.Problems)
+		return
+	}
 	if errors.Is(err, domain.ErrNotFound) {
 		writeProblem(w, http.StatusNotFound, fmt.Sprintf("Kein Gebrauchtwagen mit id=%d gefunden", id))
 		return
@@ -154,7 +165,7 @@ func (h GebrauchtwagenHandler) Delete(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err := h.Repository.Delete(r.Context(), id)
+	err := h.Service.Delete(r.Context(), id)
 	if errors.Is(err, domain.ErrNotFound) {
 		writeProblem(w, http.StatusNotFound, fmt.Sprintf("Kein Gebrauchtwagen mit id=%d gefunden", id))
 		return
@@ -188,11 +199,6 @@ func decodeWriteBody(w http.ResponseWriter, r *http.Request) (domain.Gebrauchtwa
 	decoder.DisallowUnknownFields()
 	if err := decoder.Decode(&input); err != nil {
 		writeProblem(w, http.StatusBadRequest, "ungueltiger JSON-Request")
-		return domain.GebrauchtwagenWrite{}, false
-	}
-
-	if problems := domain.ValidateWrite(&input); len(problems) > 0 {
-		writeProblem(w, http.StatusUnprocessableEntity, problems)
 		return domain.GebrauchtwagenWrite{}, false
 	}
 
