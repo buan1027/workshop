@@ -129,6 +129,8 @@ Fehler werden als `application/problem+json` zurueckgegeben. Beispiele:
 - `428 Precondition Required`: `If-Match` fehlt bei `PUT`
 - `412 Precondition Failed`: Versionskonflikt bei `PUT`
 
+Die optimistische Synchronisation erfolgt ueber die Spalte `version` und ETags wie `"1"`. `GET /api/gebrauchtwagen/{id}` liefert den aktuellen `ETag`; `PUT` erwartet diesen Wert im Header `If-Match` und erhoeht die Version bei erfolgreicher Aktualisierung. Aus Kompatibilitaetsgruenden akzeptiert der Server auch schwache ETags wie `W/"1"`.
+
 ## Tests
 
 ```powershell

@@ -73,7 +73,7 @@ func (h GebrauchtwagenHandler) Detail(w http.ResponseWriter, r *http.Request) {
 	}
 
 	etag := createETag(item.Version)
-	if r.Header.Get("If-None-Match") == etag {
+	if version, ok := parseETagVersion(r.Header.Get("If-None-Match")); ok && version == item.Version {
 		w.WriteHeader(http.StatusNotModified)
 		return
 	}
@@ -278,16 +278,25 @@ func parseID(w http.ResponseWriter, r *http.Request) (int, bool) {
 }
 
 func parseIfMatch(w http.ResponseWriter, r *http.Request) (int, bool) {
-	raw := strings.TrimSpace(r.Header.Get("If-Match"))
-	if raw == "" {
+	version, ok := parseETagVersion(r.Header.Get("If-Match"))
+	if !ok {
 		writeProblem(w, http.StatusPreconditionRequired, "Header \"If-Match\" fehlt oder ist ungueltig")
 		return 0, false
 	}
 
+	return version, true
+}
+
+func parseETagVersion(header string) (int, bool) {
+	raw := strings.TrimSpace(header)
+	if raw == "" {
+		return 0, false
+	}
+
+	raw = strings.TrimSpace(strings.TrimPrefix(raw, "W/"))
 	raw = strings.Trim(raw, `"`)
 	version, err := strconv.Atoi(raw)
 	if err != nil || version <= 0 {
-		writeProblem(w, http.StatusPreconditionRequired, "Header \"If-Match\" fehlt oder ist ungueltig")
 		return 0, false
 	}
 

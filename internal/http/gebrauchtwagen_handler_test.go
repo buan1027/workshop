@@ -224,6 +224,21 @@ func TestDetailReturnsETag(t *testing.T) {
 	}
 }
 
+func TestDetailReturnsNotModifiedForMatchingETag(t *testing.T) {
+	router := NewRouter(Dependencies{Repository: &fakeGebrauchtwagenRepository{items: []domain.Gebrauchtwagen{{
+		ID: 1, FIN: "WVWZZZ1JZXW000001", Marke: "VW", Modell: "Golf", Fahrzeugklasse: "KOMPAKTKLASSE", Kraftstoffart: "BENZIN", Schadenfrei: true, Kilometerstand: 12000, Version: 3,
+	}}}})
+	response := httptest.NewRecorder()
+	request := httptest.NewRequest(http.MethodGet, "/api/gebrauchtwagen/1", nil)
+	request.Header.Set("If-None-Match", `W/"3"`)
+
+	router.ServeHTTP(response, request)
+
+	if response.Code != http.StatusNotModified {
+		t.Fatalf("expected status 304, got %d", response.Code)
+	}
+}
+
 func TestUpdateRequiresIfMatch(t *testing.T) {
 	router := NewRouter(Dependencies{Repository: &fakeGebrauchtwagenRepository{items: []domain.Gebrauchtwagen{{ID: 1, Version: 1}}}})
 	body := `{"fin":"WVWZZZ1JZXW000001","marke":"VW","modell":"Golf","fahrzeugklasse":"KOMPAKTKLASSE","kraftstoffart":"BENZIN","schadenfrei":true,"kilometerstand":12000}`
@@ -234,6 +249,29 @@ func TestUpdateRequiresIfMatch(t *testing.T) {
 
 	if response.Code != http.StatusPreconditionRequired {
 		t.Fatalf("expected status 428, got %d", response.Code)
+	}
+}
+
+func TestUpdateAcceptsWeakIfMatchAndReturnsNextETag(t *testing.T) {
+	repo := &fakeGebrauchtwagenRepository{items: []domain.Gebrauchtwagen{{
+		ID: 1, FIN: "WVWZZZ1JZXW000001", Marke: "VW", Modell: "Golf", Fahrzeugklasse: "KOMPAKTKLASSE", Kraftstoffart: "BENZIN", Schadenfrei: true, Kilometerstand: 12000, Version: 1,
+	}}}
+	router := NewRouter(Dependencies{Repository: repo})
+	body := `{"fin":"WVWZZZ1JZXW000001","marke":"VW","modell":"Golf Variant","fahrzeugklasse":"KOMBI","kraftstoffart":"BENZIN","schadenfrei":true,"kilometerstand":43000}`
+	response := httptest.NewRecorder()
+	request := httptest.NewRequest(http.MethodPut, "/api/gebrauchtwagen/1", strings.NewReader(body))
+	request.Header.Set("If-Match", `W/"1"`)
+
+	router.ServeHTTP(response, request)
+
+	if response.Code != http.StatusNoContent {
+		t.Fatalf("expected status 204, got %d body=%s", response.Code, response.Body.String())
+	}
+	if etag := response.Header().Get("ETag"); etag != `"2"` {
+		t.Fatalf("expected ETag \"2\", got %q", etag)
+	}
+	if repo.items[0].Version != 2 {
+		t.Fatalf("expected version 2, got %d", repo.items[0].Version)
 	}
 }
 

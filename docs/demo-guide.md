@@ -113,7 +113,7 @@ Erst Detail abrufen und `ETag` merken:
 Invoke-WebRequest http://localhost:3000/api/gebrauchtwagen/1
 ```
 
-Dann mit passendem `If-Match` aktualisieren:
+Dann mit passendem `If-Match` aktualisieren. Der Wert entspricht dem `ETag` aus der Detailantwort, z.B. `"1"`:
 
 ```powershell
 Invoke-WebRequest http://localhost:3000/api/gebrauchtwagen/1 `

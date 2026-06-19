@@ -66,6 +66,13 @@ go test ./internal/repository
 - Das entspricht dem Demo-Verhalten aus den vorherigen Abgaben.
 - Abschaltbar mit `RESET_DATABASE_ON_START=false`, falls Daten lokal erhalten bleiben sollen.
 
+### Optimistische Synchronisation
+
+- Das Datenmodell enthaelt `version`.
+- `GET /api/gebrauchtwagen/{id}` liefert die aktuelle Version als `ETag`.
+- `PUT` verlangt `If-Match`; bei veralteter Version antwortet der Server mit `412 Precondition Failed`.
+- Nach erfolgreichem Update wird `version` in PostgreSQL erhoeht.
+
 ### Linting und statische Codeanalyse
 
 - `gofmt` fuer einheitliche Formatierung.
