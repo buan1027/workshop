@@ -72,6 +72,12 @@ Lokal gebuendelt in:
 .\scripts\check.ps1
 ```
 
+### Bruno
+
+- Manuelle REST-Requests liegen in `bruno/`.
+- Die Umgebung `local` verwendet `baseUrl = http://localhost:3000`.
+- Der optionale `adminToken` kann gesetzt werden, wenn der Server mit `ADMIN_TOKEN` gestartet wurde.
+
 ## Prompts/Requests an KI-Agent/en
 
 - Aufgabenstellung analysieren und Ressourcen, Endpunkte, Validierungen und Risiken ableiten.

@@ -1,0 +1,31 @@
+meta {
+  name: Update
+  type: http
+  seq: 6
+}
+
+put {
+  url: {{baseUrl}}/api/gebrauchtwagen/1
+  body: json
+  auth: bearer
+}
+
+headers {
+  Content-Type: application/json
+  If-Match: "1"
+}
+
+auth:bearer {
+  token: {{adminToken}}
+}
+
+body:json {
+  {
+    "marke": "VW",
+    "modell": "Golf Variant",
+    "fahrzeugklasse": "KOMBI",
+    "kraftstoffart": "BENZIN",
+    "schadenfrei": true,
+    "kilometerstand": 43000
+  }
+}

@@ -104,6 +104,7 @@ Invoke-RestMethod http://localhost:3000/api/gebrauchtwagen `
 Weitere Beispielrequests liegen in `docs/requests.http`.
 Ein kompakter Vorfuehrablauf liegt in `docs/demo-guide.md`.
 Eine schlanke OpenAPI-Beschreibung liegt in `docs/openapi.yaml`.
+Eine Bruno-Collection fuer manuelle API-Tests liegt in `bruno/`.
 
 ## Validierung und Fehler
 

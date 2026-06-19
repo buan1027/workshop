@@ -1,0 +1,26 @@
+meta {
+  name: Create ungueltig
+  type: http
+  seq: 5
+}
+
+post {
+  url: {{baseUrl}}/api/gebrauchtwagen
+  body: json
+  auth: none
+}
+
+headers {
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "marke": "",
+    "modell": "",
+    "fahrzeugklasse": "FALSCH",
+    "kraftstoffart": "BENZIN",
+    "schadenfrei": true,
+    "kilometerstand": -1
+  }
+}

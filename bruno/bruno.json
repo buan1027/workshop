@@ -1,0 +1,9 @@
+{
+  "version": "1",
+  "name": "workshop-gebrauchtwagen",
+  "type": "collection",
+  "ignore": [
+    "node_modules",
+    ".git"
+  ]
+}

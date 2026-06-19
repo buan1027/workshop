@@ -1,0 +1,47 @@
+meta {
+  name: Create
+  type: http
+  seq: 4
+}
+
+post {
+  url: {{baseUrl}}/api/gebrauchtwagen
+  body: json
+  auth: bearer
+}
+
+headers {
+  Content-Type: application/json
+}
+
+auth:bearer {
+  token: {{adminToken}}
+}
+
+body:json {
+  {
+    "marke": "Mercedes",
+    "modell": "C 200",
+    "fahrzeugklasse": "MITTELKLASSE",
+    "kraftstoffart": "BENZIN",
+    "schadenfrei": true,
+    "kilometerstand": 18000,
+    "standort": {
+      "plz": "76131",
+      "ort": "Karlsruhe"
+    },
+    "hauptuntersuchung": {
+      "pruefdatum": "2025-06-01",
+      "gueltigBis": "2027-06-01",
+      "prueforganisation": "TUEV",
+      "status": "BESTANDEN"
+    },
+    "schaeden": [
+      {
+        "bezeichnung": "Kratzer",
+        "beschreibung": "Kleiner Lackkratzer",
+        "feststellungsdatum": "2024-11-10"
+      }
+    ]
+  }
+}
