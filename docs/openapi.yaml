@@ -1,0 +1,217 @@
+openapi: 3.0.3
+info:
+  title: Workshop Gebrauchtwagen API
+  version: 1.0.0
+  description: REST-API fuer den Go-Workshop-Server.
+servers:
+  - url: http://localhost:3000
+paths:
+  /health/liveness:
+    get:
+      summary: Liveness-Status
+      responses:
+        "200":
+          description: Serverprozess laeuft.
+  /health/readiness:
+    get:
+      summary: Readiness-Status
+      responses:
+        "200":
+          description: Server und Datenbank sind bereit.
+        "503":
+          description: Datenbank ist nicht erreichbar.
+  /api/gebrauchtwagen:
+    get:
+      summary: Gebrauchtwagen suchen
+      parameters:
+        - name: marke
+          in: query
+          schema:
+            type: string
+        - name: modell
+          in: query
+          schema:
+            type: string
+        - name: fahrzeugklasse
+          in: query
+          schema:
+            $ref: "#/components/schemas/Fahrzeugklasse"
+        - name: kraftstoffart
+          in: query
+          schema:
+            $ref: "#/components/schemas/Kraftstoffart"
+        - name: schadenfrei
+          in: query
+          schema:
+            type: boolean
+        - name: page
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            default: 1
+        - name: size
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 50
+            default: 5
+        - name: count-only
+          in: query
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Trefferliste oder Count-Antwort.
+        "422":
+          description: Ungueltige Suchparameter.
+    post:
+      summary: Gebrauchtwagen anlegen
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/GebrauchtwagenWrite"
+      responses:
+        "201":
+          description: Fahrzeug wurde angelegt.
+          headers:
+            Location:
+              schema:
+                type: string
+            ETag:
+              schema:
+                type: string
+        "400":
+          description: Ungueltiges JSON.
+        "401":
+          description: ADMIN_TOKEN ist gesetzt und Authorization fehlt oder ist falsch.
+        "422":
+          description: Validierungsfehler.
+  /api/gebrauchtwagen/{id}:
+    get:
+      summary: Gebrauchtwagen-Detail lesen
+      parameters:
+        - $ref: "#/components/parameters/id"
+        - name: If-None-Match
+          in: header
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Detailantwort mit relationalen Daten.
+          headers:
+            ETag:
+              schema:
+                type: string
+        "304":
+          description: Version unveraendert.
+        "404":
+          description: Fahrzeug wurde nicht gefunden.
+        "422":
+          description: ID ist ungueltig.
+    put:
+      summary: Gebrauchtwagen aktualisieren
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: "#/components/parameters/id"
+        - name: If-Match
+          in: header
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/GebrauchtwagenWrite"
+      responses:
+        "204":
+          description: Fahrzeug wurde aktualisiert.
+        "401":
+          description: ADMIN_TOKEN ist gesetzt und Authorization fehlt oder ist falsch.
+        "404":
+          description: Fahrzeug wurde nicht gefunden.
+        "412":
+          description: Versionskonflikt.
+        "428":
+          description: If-Match fehlt oder ist ungueltig.
+    delete:
+      summary: Gebrauchtwagen loeschen
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: "#/components/parameters/id"
+      responses:
+        "204":
+          description: Fahrzeug wurde geloescht.
+        "401":
+          description: ADMIN_TOKEN ist gesetzt und Authorization fehlt oder ist falsch.
+        "404":
+          description: Fahrzeug wurde nicht gefunden.
+components:
+  parameters:
+    id:
+      name: id
+      in: path
+      required: true
+      schema:
+        type: integer
+        minimum: 1
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      description: Optionaler ADMIN_TOKEN fuer schreibende Endpunkte.
+  schemas:
+    Fahrzeugklasse:
+      type: string
+      enum:
+        - KLEINWAGEN
+        - KOMPAKTKLASSE
+        - MITTELKLASSE
+        - OBERKLASSE
+        - SUV
+        - KOMBI
+        - CABRIO
+        - TRANSPORTER
+    Kraftstoffart:
+      type: string
+      enum:
+        - BENZIN
+        - DIESEL
+        - ELEKTRO
+        - HYBRID
+        - ERDGAS
+        - WASSERSTOFF
+    GebrauchtwagenWrite:
+      type: object
+      required:
+        - marke
+        - modell
+        - fahrzeugklasse
+        - kraftstoffart
+        - schadenfrei
+        - kilometerstand
+      properties:
+        marke:
+          type: string
+          minLength: 1
+        modell:
+          type: string
+          minLength: 1
+        fahrzeugklasse:
+          $ref: "#/components/schemas/Fahrzeugklasse"
+        kraftstoffart:
+          $ref: "#/components/schemas/Kraftstoffart"
+        schadenfrei:
+          type: boolean
+        kilometerstand:
+          type: integer
+          minimum: 0

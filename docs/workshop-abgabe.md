@@ -65,3 +65,4 @@ go test ./internal/repository
 - Geeignete Go-Frameworks fuer REST, Datenbankzugriff, Validierung und Tests vergleichen.
 - Empfohlene Loesung mit `chi` und `pgx` umsetzen.
 - Projektstruktur, CRUD-Endpunkte, Fehlerbehandlung, Tests, Docker-Setup und README erstellen.
+- OpenAPI-Beschreibung und Demo-Ablauf fuer die Abgabe dokumentieren.
