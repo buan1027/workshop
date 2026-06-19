@@ -59,6 +59,19 @@ $env:INTEGRATION_DATABASE_URL="postgres://gebrauchtwagen:gebrauchtwagen@localhos
 go test ./internal/repository
 ```
 
+### Linting und statische Codeanalyse
+
+- `gofmt` fuer einheitliche Formatierung.
+- `go vet` als offizielles Go-Analysewerkzeug fuer verdaechtige Konstrukte.
+- `staticcheck` fuer zusaetzliche statische Analyse, Bugs, Performance- und Vereinfachungshinweise.
+- `govulncheck` fuer bekannte Sicherheitsluecken in tatsaechlich verwendeten Go-Abhaengigkeiten.
+
+Lokal gebuendelt in:
+
+```powershell
+.\scripts\check.ps1
+```
+
 ## Prompts/Requests an KI-Agent/en
 
 - Aufgabenstellung analysieren und Ressourcen, Endpunkte, Validierungen und Risiken ableiten.

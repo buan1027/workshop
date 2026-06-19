@@ -129,6 +129,28 @@ go test ./...
 Die vorhandenen Tests pruefen Validierung, Healthcheck, Create, Detail mit ETag und Fehlerfaelle. Die HTTP-Tests nutzen ein Fake-Repository und brauchen keine echte Datenbank.
 Auf GitHub fuehrt der Workflow `.github/workflows/go.yml` Formatpruefung und Tests automatisch aus.
 
+## Linting und statische Analyse
+
+Lokale Standardpruefung:
+
+```powershell
+.\scripts\check.ps1
+```
+
+Enthalten sind:
+
+- `gofmt -l .` fuer Formatierung
+- `go vet ./...` fuer offizielle Go-Analyse
+- `go test ./...` fuer Tests
+- `staticcheck ./...` ueber `go run` fuer zusaetzliche statische Analyse
+- `govulncheck ./...` ueber `go run` fuer bekannte Sicherheitsluecken
+
+Falls gerade kein Netzwerk verfuegbar ist:
+
+```powershell
+.\scripts\check.ps1 -SkipOnlineTools
+```
+
 Optionaler Integrationstest gegen PostgreSQL:
 
 ```powershell

@@ -10,6 +10,8 @@ jobs:
   test:
     name: Tests
     runs-on: ubuntu-latest
+    env:
+      GOFLAGS: -buildvcs=false
 
     steps:
       - name: Repository auschecken
@@ -24,5 +26,14 @@ jobs:
       - name: Formatierung pruefen
         run: test -z "$(gofmt -l .)"
 
+      - name: Statische Analyse mit go vet
+        run: go vet ./...
+
+      - name: Statische Analyse mit Staticcheck
+        run: go run honnef.co/go/tools/cmd/staticcheck@latest ./...
+
       - name: Tests ausfuehren
         run: go test ./...
+
+      - name: Sicherheitsanalyse mit govulncheck
+        run: go run golang.org/x/vuln/cmd/govulncheck@latest ./...
